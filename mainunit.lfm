@@ -1,0 +1,302 @@
+object PaintForm: TPaintForm
+  Left = 766
+  Height = 707
+  Top = 209
+  Width = 825
+  Caption = 'Paint(no)'
+  ClientHeight = 687
+  ClientWidth = 825
+  Menu = MainMenu1
+  OnCreate = FormCreate
+  LCLVersion = '1.6.4.0'
+  object DrawPlace: TPaintBox
+    Left = 78
+    Height = 666
+    Top = 0
+    Width = 730
+    Align = alClient
+    Color = clWindow
+    ParentColor = False
+    OnClick = DrawPlaceClick
+    OnMouseDown = DrawPlaceMouseDown
+    OnMouseMove = DrawPlaceMouseMove
+    OnMouseUp = DrawPlaceMouseUp
+    OnPaint = DrawPlacePaint
+  end
+  object PanelForAll: TPanel
+    Left = 0
+    Height = 666
+    Top = 0
+    Width = 78
+    Align = alLeft
+    ClientHeight = 666
+    ClientWidth = 78
+    TabOrder = 0
+    object ToolsPanel: TPanel
+      Left = 1
+      Height = 256
+      Top = 409
+      Width = 76
+      Align = alBottom
+      ClientHeight = 256
+      ClientWidth = 76
+      TabOrder = 0
+      object FillStyle: TComboBox
+        Left = 0
+        Height = 23
+        Top = 72
+        Width = 77
+        AutoSize = False
+        ItemHeight = 15
+        TabOrder = 0
+        Text = 'FillStyle'
+      end
+      object FillStyleName: TLabel
+        Left = 4
+        Height = 20
+        Top = 48
+        Width = 76
+        AutoSize = False
+        Caption = 'Fill Style'
+        Font.Height = 20
+        ParentColor = False
+        ParentFont = False
+      end
+      object FillColorName: TLabel
+        Left = 6
+        Height = 20
+        Top = 96
+        Width = 74
+        AutoSize = False
+        Caption = 'Fill Color'
+        Font.Height = 20
+        ParentColor = False
+        ParentFont = False
+      end
+      object FillColor: TColorButton
+        Left = 0
+        Height = 29
+        Top = 120
+        Width = 77
+        BorderWidth = 2
+        ButtonColorSize = 16
+        ButtonColor = clBlack
+        ColorDialog = FillColorDialog
+      end
+      object LineColor: TColorButton
+        Left = 0
+        Height = 29
+        Top = 224
+        Width = 77
+        BorderWidth = 2
+        ButtonColorSize = 16
+        ButtonColor = clLime
+        ColorDialog = LineColorDialog
+      end
+      object LineColorName: TLabel
+        Left = 4
+        Height = 20
+        Top = 200
+        Width = 76
+        AutoSize = False
+        Caption = 'Line Color'
+        Font.Height = 20
+        ParentColor = False
+        ParentFont = False
+      end
+      object LineWidth: TSpinEdit
+        Left = 0
+        Height = 23
+        Top = 176
+        Width = 74
+        MinValue = 1
+        OnChange = LineWidthChange
+        TabOrder = 1
+        Value = 1
+      end
+      object LineWidthName: TLabel
+        Left = 4
+        Height = 24
+        Top = 152
+        Width = 76
+        AutoSize = False
+        Caption = 'Line Width'
+        Font.Height = 20
+        ParentColor = False
+        ParentFont = False
+      end
+      object RadiusName: TLabel
+        Left = 5
+        Height = 20
+        Top = 0
+        Width = 75
+        AutoSize = False
+        Caption = 'Radius'
+        Font.Height = 20
+        ParentColor = False
+        ParentFont = False
+      end
+      object Radius: TSpinEdit
+        Left = -1
+        Height = 23
+        Top = 24
+        Width = 76
+        AutoSize = False
+        MaxValue = 500
+        MinValue = 1
+        OnChange = RadiusChange
+        TabOrder = 2
+        Value = 1
+      end
+    end
+    object Label1: TLabel
+      Left = 20
+      Height = 15
+      Top = 247
+      Width = 34
+      Caption = 'Label1'
+      ParentColor = False
+    end
+    object Label2: TLabel
+      Left = 15
+      Height = 15
+      Top = 288
+      Width = 34
+      Caption = 'Label2'
+      ParentColor = False
+    end
+    object Label3: TLabel
+      Left = 28
+      Height = 15
+      Top = 378
+      Width = 34
+      Caption = 'Label3'
+      ParentColor = False
+    end
+    object Label4: TLabel
+      Left = 39
+      Height = 15
+      Top = 404
+      Width = 34
+      Caption = 'Label4'
+      ParentColor = False
+    end
+    object Label5: TLabel
+      Left = 30
+      Height = 15
+      Top = 428
+      Width = 34
+      Caption = 'Label5'
+      ParentColor = False
+    end
+    object Label6: TLabel
+      Left = 32
+      Height = 15
+      Top = 449
+      Width = 34
+      Caption = 'Label6'
+      ParentColor = False
+    end
+    object SpinEdit1: TSpinEdit
+      Left = 4
+      Height = 23
+      Top = 208
+      Width = 73
+      MaxValue = 1600
+      MinValue = 1
+      OnChange = SpinEdit1Change
+      TabOrder = 1
+      Value = 1
+    end
+  end
+  object HScrollBar: TScrollBar
+    Left = 0
+    Height = 21
+    Top = 666
+    Width = 825
+    Align = alBottom
+    PageSize = 0
+    TabOrder = 1
+  end
+  object VScrollBar: TScrollBar
+    Left = 808
+    Height = 666
+    Top = 0
+    Width = 17
+    Align = alRight
+    Kind = sbVertical
+    PageSize = 0
+    TabOrder = 2
+  end
+  object FillColorDialog: TColorDialog
+    OnClose = FillColorDialogClose
+    Color = clBlack
+    CustomColors.Strings = (
+      'ColorA=000000'
+      'ColorB=000080'
+      'ColorC=008000'
+      'ColorD=008080'
+      'ColorE=800000'
+      'ColorF=800080'
+      'ColorG=808000'
+      'ColorH=808080'
+      'ColorI=C0C0C0'
+      'ColorJ=0000FF'
+      'ColorK=00FF00'
+      'ColorL=00FFFF'
+      'ColorM=FF0000'
+      'ColorN=FF00FF'
+      'ColorO=FFFF00'
+      'ColorP=FFFFFF'
+      'ColorQ=C0DCC0'
+      'ColorR=F0CAA6'
+      'ColorS=F0FBFF'
+      'ColorT=A4A0A0'
+    )
+    left = 48
+    top = 312
+  end
+  object LineColorDialog: TColorDialog
+    OnClose = LineColorDialogClose
+    Color = clBlack
+    CustomColors.Strings = (
+      'ColorA=000000'
+      'ColorB=000080'
+      'ColorC=008000'
+      'ColorD=008080'
+      'ColorE=800000'
+      'ColorF=800080'
+      'ColorG=808000'
+      'ColorH=808080'
+      'ColorI=C0C0C0'
+      'ColorJ=0000FF'
+      'ColorK=00FF00'
+      'ColorL=00FFFF'
+      'ColorM=FF0000'
+      'ColorN=FF00FF'
+      'ColorO=FFFF00'
+      'ColorP=FFFFFF'
+      'ColorQ=C0DCC0'
+      'ColorR=F0CAA6'
+      'ColorS=F0FBFF'
+      'ColorT=A4A0A0'
+    )
+    left = 78
+    top = 312
+  end
+  object MainMenu1: TMainMenu
+    left = 65528
+    top = 312
+    object MenuItem1: TMenuItem
+      Caption = 'New Item1'
+      object MenuItem2: TMenuItem
+        Caption = 'New Item2'
+        OnClick = MenuItem2Click
+      end
+    end
+  end
+  object SaveDialog1: TSaveDialog
+    left = 22
+    top = 312
+  end
+end
