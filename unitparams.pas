@@ -131,7 +131,7 @@ implementation
        Align:= AlBottom;
        Width:= 77;
        Height:= 29;
-       ButtonColor:= ALineColor;
+       ButtonColor:= LineColor;
      end;
 
      LineColorParamName:= TLabel.Create(ParamsPanel);
@@ -151,7 +151,7 @@ implementation
        Align:= AlBottom;
        Width:= 74;
        Height:= 23;
-       Value:= 1;
+       Value:= LineWidth;
        MinValue:= 1;
        MaxValue:= 100;
        OnChange:=  @WidthChange;
@@ -182,7 +182,7 @@ implementation
        Align:= AlBottom;
        Width:= 77;
        Height:= 29;
-       ButtonColor:= ALineColor;
+       ButtonColor:= LineColor;
      end;
 
      LineColorParamName:= TLabel.Create(ParamsPanel);
@@ -202,7 +202,7 @@ implementation
        Align:= AlBottom;
        Width:= 74;
        Height:= 23;
-       Value:= 1;
+       Value:= LineWidth;
        MinValue:= 1;
        MaxValue:= 100;
        OnChange:=  @WidthChange;
@@ -236,7 +236,7 @@ implementation
        Align:= AlBottom;
        Width:= 77;
        Height:= 29;
-       ButtonColor:= ALineColor;
+       ButtonColor:= LineColor;
      end;
 
      LineColorParamName:= TLabel.Create(ParamsPanel);
@@ -256,7 +256,7 @@ implementation
        Align:= AlBottom;
        Width:= 74;
        Height:= 23;
-       Value:= 1;
+       Value:= LineWidth;
        MinValue:= 1;
        MaxValue:= 100;
        OnChange:=  @WidthChange;
@@ -279,7 +279,7 @@ implementation
        Align:=AlBottom;
        Width:= 77;
        Height:= 29;
-       ButtonColor:= AFillColor;
+       ButtonColor:= FillColor;
        ColorDialog:= FillColorDialogParam;
      end;
 
@@ -339,7 +339,7 @@ implementation
        Align:= AlBottom;
        Width:= 77;
        Height:= 29;
-       ButtonColor:= ALineColor;
+       ButtonColor:= LineColor;
      end;
 
      LineColorParamName:= TLabel.Create(ParamsPanel);
@@ -359,7 +359,7 @@ implementation
        Align:= AlBottom;
        Width:= 74;
        Height:= 23;
-       Value:= 1;
+       Value:= LineWidth;
        MinValue:= 1;
        MaxValue:= 100;
        OnChange:=  @WidthChange;
@@ -382,7 +382,7 @@ implementation
        Align:=AlBottom;
        Width:= 77;
        Height:= 29;
-       ButtonColor:= AFillColor;
+       ButtonColor:= FillColor;
        ColorDialog:= FillColorDialogParam;
      end;
 
@@ -440,7 +440,7 @@ implementation
        Align:= AlBottom;
        Width:= 77;
        Height:= 29;
-       ButtonColor:= ALineColor;
+       ButtonColor:= LineColor;
      end;
 
      LineColorParamName:= TLabel.Create(ParamsPanel);
@@ -460,7 +460,7 @@ implementation
        Align:= AlBottom;
        Width:= 74;
        Height:= 23;
-       Value:= 1;
+       Value:= LineWidth;
        MinValue:= 1;
        MaxValue:= 100;
        OnChange:=  @WidthChange;
@@ -483,7 +483,7 @@ implementation
        Align:=AlBottom;
        Width:= 77;
        Height:= 29;
-       ButtonColor:= AFillColor;
+       ButtonColor:= FillColor;
        ColorDialog:= FillColorDialogParam;
      end;
 
@@ -532,7 +532,7 @@ implementation
        Height:= 23;
        MaxValue:= 100;
        MinValue:= 1;
-       Value:= 10;
+       Value:= RadiusH;
        OnChange:= @RadiusChange;
      end;
 
