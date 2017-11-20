@@ -149,30 +149,6 @@ object PaintForm: TPaintForm
         Value = 1
       end
     end
-    object Label1: TLabel
-      Left = 20
-      Height = 15
-      Top = 247
-      Width = 34
-      Caption = 'Label1'
-      ParentColor = False
-    end
-    object Label2: TLabel
-      Left = 15
-      Height = 15
-      Top = 288
-      Width = 34
-      Caption = 'Label2'
-      ParentColor = False
-    end
-    object Label3: TLabel
-      Left = 28
-      Height = 15
-      Top = 378
-      Width = 34
-      Caption = 'Label3'
-      ParentColor = False
-    end
     object Label4: TLabel
       Left = 39
       Height = 15

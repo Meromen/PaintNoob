@@ -20,9 +20,6 @@ Type
   { TPaintForm }
 
   TPaintForm = class(TForm)
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
@@ -350,8 +347,6 @@ begin
       SetLength(CanvasTools, Length(CanvasTools) + 1);
       CanvasTools[High(CanvasTools)]:= CurrentTool.Create((x), (y));
       LastOffset:= Offset1;
-      Label3.Caption:= inttostr(Lastoffset.x);
-      Label4.Caption:= Inttostr(LastOffset.y);
     end;
   end;
   DrawPlace.Invalidate;
@@ -374,12 +369,8 @@ begin
   If ToolNow then
   If IsDrawing then
   begin
-    Label5.Caption:= inttostr(lastoffset.x);
-    Label6.Caption:= Inttostr(LastOffset.y);
     CanvasTools[High(CanvasTools)].MouseMove(x, y, LastOffset);
     Offset1:= Offsetout();
-    label1.caption:= IntToStr(offset1.x);
-    Label2.caption:= IntToStr(Offset1.y);
     DrawPlace.Invalidate;
   end;
 end;
