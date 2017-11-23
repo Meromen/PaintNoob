@@ -32,147 +32,6 @@ object PaintForm: TPaintForm
     ClientHeight = 666
     ClientWidth = 78
     TabOrder = 0
-    object ToolsPanel: TPanel
-      Left = 1
-      Height = 256
-      Top = 409
-      Width = 76
-      Align = alBottom
-      ClientHeight = 256
-      ClientWidth = 76
-      TabOrder = 0
-      object FillStyle: TComboBox
-        Left = 0
-        Height = 23
-        Top = 72
-        Width = 77
-        AutoSize = False
-        ItemHeight = 15
-        TabOrder = 0
-        Text = 'FillStyle'
-      end
-      object FillStyleName: TLabel
-        Left = 4
-        Height = 20
-        Top = 48
-        Width = 76
-        AutoSize = False
-        Caption = 'Fill Style'
-        Font.Height = 20
-        ParentColor = False
-        ParentFont = False
-      end
-      object FillColorName: TLabel
-        Left = 6
-        Height = 20
-        Top = 96
-        Width = 74
-        AutoSize = False
-        Caption = 'Fill Color'
-        Font.Height = 20
-        ParentColor = False
-        ParentFont = False
-      end
-      object FillColor: TColorButton
-        Left = 0
-        Height = 29
-        Top = 120
-        Width = 77
-        BorderWidth = 2
-        ButtonColorSize = 16
-        ButtonColor = clBlack
-        ColorDialog = FillColorDialog
-      end
-      object LineColor: TColorButton
-        Left = 0
-        Height = 29
-        Top = 224
-        Width = 77
-        BorderWidth = 2
-        ButtonColorSize = 16
-        ButtonColor = clLime
-        ColorDialog = LineColorDialog
-      end
-      object LineColorName: TLabel
-        Left = 4
-        Height = 20
-        Top = 200
-        Width = 76
-        AutoSize = False
-        Caption = 'Line Color'
-        Font.Height = 20
-        ParentColor = False
-        ParentFont = False
-      end
-      object LineWidth: TSpinEdit
-        Left = 0
-        Height = 23
-        Top = 176
-        Width = 74
-        MinValue = 1
-        OnChange = LineWidthChange
-        TabOrder = 1
-        Value = 1
-      end
-      object LineWidthName: TLabel
-        Left = 4
-        Height = 24
-        Top = 152
-        Width = 76
-        AutoSize = False
-        Caption = 'Line Width'
-        Font.Height = 20
-        ParentColor = False
-        ParentFont = False
-      end
-      object RadiusName: TLabel
-        Left = 5
-        Height = 20
-        Top = 0
-        Width = 75
-        AutoSize = False
-        Caption = 'Radius'
-        Font.Height = 20
-        ParentColor = False
-        ParentFont = False
-      end
-      object Radius: TSpinEdit
-        Left = -1
-        Height = 23
-        Top = 24
-        Width = 76
-        AutoSize = False
-        MaxValue = 500
-        MinValue = 1
-        OnChange = RadiusChange
-        TabOrder = 2
-        Value = 1
-      end
-    end
-    object Label4: TLabel
-      Left = 39
-      Height = 15
-      Top = 404
-      Width = 34
-      Caption = 'Label4'
-      ParentColor = False
-    end
-    object Label5: TLabel
-      Left = 30
-      Height = 15
-      Top = 428
-      Width = 34
-      Caption = 'Label5'
-      ParentColor = False
-    end
-    object Label6: TLabel
-      Left = 32
-      Height = 15
-      Top = 449
-      Width = 34
-      Caption = 'Label6'
-      ParentColor = False
-    end
     object SpinEdit1: TSpinEdit
       Left = 4
       Height = 23
@@ -180,9 +39,16 @@ object PaintForm: TPaintForm
       Width = 73
       MaxValue = 1600
       MinValue = 1
-      OnChange = SpinEdit1Change
-      TabOrder = 1
+      TabOrder = 0
       Value = 1
+    end
+    object ParamsPanel: TPanel
+      Left = 1
+      Height = 305
+      Top = 360
+      Width = 76
+      Align = alBottom
+      TabOrder = 1
     end
   end
   object HScrollBar: TScrollBar
@@ -205,7 +71,6 @@ object PaintForm: TPaintForm
     TabOrder = 2
   end
   object FillColorDialog: TColorDialog
-    OnClose = FillColorDialogClose
     Color = clBlack
     CustomColors.Strings = (
       'ColorA=000000'
@@ -233,7 +98,6 @@ object PaintForm: TPaintForm
     top = 312
   end
   object LineColorDialog: TColorDialog
-    OnClose = LineColorDialogClose
     Color = clBlack
     CustomColors.Strings = (
       'ColorA=000000'

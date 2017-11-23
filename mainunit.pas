@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
-  ExtCtrls, Spin, ActnList, Buttons, StdCtrls, ComCtrls, UnitTFigure,
+  ExtCtrls, Spin, ActnList, Buttons, StdCtrls, ComCtrls, UnitTFigure, UnitParams,
   UnitTTools, Transformation ;
 
 Type
@@ -20,29 +20,17 @@ Type
   { TPaintForm }
 
   TPaintForm = class(TForm)
-    Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
-    LineColor: TColorButton;
     FillColorDialog: TColorDialog;
     LineColorDialog: TColorDialog;
-    FillColor: TColorButton;
-    LineColorName: TLabel;
-    FillStyle: TComboBox;
     DrawPlace: TPaintBox;
-    FillStyleName: TLabel;
-    FillColorName: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
+    ParamsPanel: TPanel;
     SaveDialog1: TSaveDialog;
     SpinEdit1: TSpinEdit;
     ToolsPanel: TPanel;
-    Radius: TSpinEdit;
-    LineWidthName: TLabel;
-    LineWidth: TSpinEdit;
     HScrollBar: TScrollBar;
-    RadiusName: TLabel;
     VScrollBar: TScrollBar;
     PanelForAll: TPanel;
     procedure DrawPlaceClick(Sender: TObject);
@@ -53,11 +41,7 @@ Type
     procedure DrawPlaceMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure DrawPlacePaint(Sender: TObject);
-    procedure FillColorDialogClose(Sender: TObject);
-    procedure FillStyleChange(Sender: TObject);
     procedure MenuItem2Click(Sender: TObject);
-    procedure RadiusChange(Sender: TObject);
-    procedure SpinEdit1Change(Sender: TObject);
     procedure TRectangleClick(Sender: TObject);
     procedure TElipseClick(Sender: TObject);
     procedure TLineClick(Sender: TObject);
@@ -66,10 +50,8 @@ Type
     procedure THandClick(Sender: TObject);
     procedure TMagnifierClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure LineColorDialogClose(Sender: TObject);
-    procedure LineWidthChange(Sender: TObject);
     procedure ToolsButClick(Sender: TObject);
-    procedure HideParams;
+
 
   private
     { private declarations }
@@ -121,18 +103,11 @@ var
   FillStylesList: TFillStyleItem;
   i: Integer;
 begin
-  PaintForm.Caption:= ApplicationName;
-  Scale:= 1;
-  CurrentFillColor:= clWhite;
-  FillColor.ButtonColor:= CurrentFillColor;
-  CurrentFillStyle:= 0;
-  FillStyle.ItemIndex:= CurrentFillStyle;
-  CurrentLineWidth:= 1;
-  LineWidth.Value:= CurrentLineWidth;
-  CurrentLineColor:= clBlack;
-  LineColor.ButtonColor:= CurrentLineColor;
-  Radius.Value:= 20;
-  CurrentRadius:= 20;
+  FillStyle:= bsSolid;
+  LineWidth:= 1;
+  FillColor:= clWhite;
+  LineColor:= clBlack;
+  RadiusW:= 10;
   SpinEdit1.Value:= 100;
   IsDrawing:= false;
 
@@ -174,9 +149,9 @@ for i:= 0 to High(ToolsList) do
     MyButton.Top:= ((Length(FigureList)+i) div 2) * (ButtonSize + 5);
   end;
 
-for FillStylesList in FillStyles do
+{for FillStylesList in FillStyles do
   FillStyle.Items.Add(FillStylesList.Name);
-  FillStyle.ItemIndex:= 0;
+  FillStyle.ItemIndex:= 0; }
 
 CurrentFigure:= FigureList[0];
 FigureNow:= True;
@@ -184,12 +159,10 @@ ToolNow:= False;
 end;
 
 
-
-
 procedure TPaintForm.ToolsButClick(Sender: TObject);
 begin
 //CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
-  HideParams;
+
   Case (Sender as TSpeedButton).Tag of
   0: TPolyLineClick(Sender);
   1: TElipseClick(Sender);
@@ -201,36 +174,14 @@ begin
   end;
 end;
 
-procedure TPaintForm.HideParams;
-begin
-  LineWidthName.Visible:= False;
-  LineWidth.Visible:= False;
-  LineColorName.Visible:= False;
-  LineColor.Visible:= False;
-  FillColorName.Visible:= False;
-  FillColor.Visible:= False;
-  FillStyleName.Visible:= False;
-  FillStyle.Visible:= False;
-  RadiusName.Visible:= False;
-  Radius.Visible:= False;
-end;
-
 procedure TPaintForm.TRectangleClick(Sender: TObject);
 begin
   FigureNow:= True;
   ToolNow:= False;
 
   CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
-  HideParams;
-
-  FillStyle.Visible:= True;
-  FillStyleName.Visible:= True;
-  FillColor.Visible:= True;
-  FillColorName.Visible:= True;
-  LineColor.Visible:= True;
-  LineColorName.Visible:= True;
-  LineWidth.Visible:= True;
-  LineWidthName.Visible:= True;
+  ParamsPanel.DestroyComponents;
+  TRectangleParams.Create(LineColor, FillColor, LineWidth, FillStyle, RadiusH, RadiusW, ParamsPanel );
 end;
 
 procedure TPaintForm.TElipseClick(Sender: TObject);
@@ -239,16 +190,8 @@ begin
   ToolNow:= False;
 
   CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
-  HideParams;
-
-  FillStyle.Visible:= True;
-  FillStyleName.Visible:= True;
-  FillColor.Visible:= True;
-  FillColorName.Visible:= True;
-  LineColor.Visible:= True;
-  LineColorName.Visible:= True;
-  LineWidth.Visible:= True;
-  LineWidthName.Visible:= True;
+  ParamsPanel.DestroyComponents;
+  TElipseParams.Create(LineColor, FillColor, LineWidth, FillStyle, RadiusH, RadiusW, ParamsPanel );
 end;
 
 procedure TPaintForm.TRoundRectClick(Sender: TObject);
@@ -257,19 +200,9 @@ begin
 
   CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
   ToolNow:= False;
-  HideParams;
 
-
-  Radius.Visible:= True;
-  RadiusName.Visible:= True;
-  FillStyle.Visible:= True;
-  FillStyleName.Visible:= True;
-  FillColor.Visible:= True;
-  FillColorName.Visible:= True;
-  LineColor.Visible:= True;
-  LineColorName.Visible:= True;
-  LineWidth.Visible:= True;
-  LineWidthName.Visible:= True;
+  ParamsPanel.DestroyComponents;
+  TRoundRectParams.Create(LineColor, FillColor, LineWidth, FillStyle, RadiusH, RadiusW, ParamsPanel );
 end;
 
 procedure TPaintForm.TPolyLineClick(Sender: TObject);
@@ -278,12 +211,8 @@ begin
   ToolNow:= False;
 
   CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
-  HideParams;
-
-  LineColor.Visible:= True;
-  LineColorName.Visible:= True;
-  LineWidth.Visible:= True;
-  LineWidthName.Visible:= True;
+  ParamsPanel.DestroyComponents;
+  TPolyLineParams.Create(LineColor, FillColor, LineWidth, FillStyle, RadiusH, RadiusW, ParamsPanel );
 end;
 
 procedure TPaintForm.TLineClick(Sender: TObject);
@@ -292,12 +221,9 @@ begin
   ToolNow:= False;
 
   CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
-  HideParams;
 
-  LineColor.Visible:= True;
-  LineColorName.Visible:= True;
-  LineWidth.Visible:= True;
-  LineWidthName.Visible:= True;
+  ParamsPanel.DestroyComponents;
+  TLineParams.Create(LineColor, FillColor, LineWidth, FillStyle, RadiusH, RadiusW, ParamsPanel );
 end;
 
 procedure TPaintForm.THandClick(Sender: TObject);
@@ -306,8 +232,8 @@ begin
   ToolNow:= True;
 
   CurrentTool:= ToolsList[(Sender as TSpeedButton).Tag-Length(FigureList)];
+  ParamsPanel.DestroyComponents;
 
-  HideParams;
 end;
 
 procedure TPaintForm.TMagnifierClick(Sender: TObject);
@@ -316,19 +242,9 @@ begin
   ToolNow:= True;
 
   CurrentTool:= ToolsList[(Sender as TSpeedButton).Tag-Length(FigureList)];
+  ParamsPanel.DestroyComponents;
+ end;
 
-  HideParams;
-end;
-
-procedure TPaintForm.LineColorDialogClose(Sender: TObject);
-begin
-  CurrentLineColor:= LineColorDialog.Color;
-end;
-
-procedure TPaintForm.FillColorDialogClose(Sender: TObject);
-begin
-  CurrentFillColor:= FillColorDialog.Color;
-end;
 
 procedure TPaintForm.DrawPlaceMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
@@ -339,7 +255,7 @@ begin
     begin
       IsDrawing:= True;
       SetLength(CanvasFigures, Length(CanvasFigures) + 1);
-      CanvasFigures[High(CanvasFigures)]:= CurrentFigure.Create(WorldToScreenX(x), WorldToScreenY(y), CurrentLineColor, CurrentFillColor, CurrentLineWidth, FillStyles[CurrentFillStyle].BrushStyle, CurrentRadius, CurrentRadius);
+      CanvasFigures[High(CanvasFigures)]:= CurrentFigure.Create(WorldToScreenX(x), WorldToScreenY(y), LineColor, FillColor, LineWidth, FillStyles[CurrentFillStyle].BrushStyle, RadiusW, RadiusW);
     end;
     If ToolNow then
     begin
@@ -401,12 +317,6 @@ begin
     i.Draw(DrawPlace.Canvas);
 end;
 
-procedure TPaintForm.FillStyleChange(Sender: TObject);
-begin
-  CurrentFillStyle:= FillStyle.ItemIndex;
-end;
-
-
 procedure TPaintForm.MenuItem2Click(Sender: TObject);
 var bmp: TBitmap;
 begin
@@ -425,22 +335,6 @@ begin
     end;
 end;
 
-
-
-procedure TPaintForm.RadiusChange(Sender: TObject);
-begin
-  CurrentRadius:= Radius.Value;
-end;
-
-procedure TPaintForm.SpinEdit1Change(Sender: TObject);
-begin
-  scale:= SpinEdit1.Value / 100
-end;
-
-procedure TPaintForm.LineWidthChange(Sender: TObject);
-begin
-  CurrentLineWidth:= LineWidth.Value;
-end;
 
 initialization
 Offset1.x:= 0;
