@@ -10,15 +10,13 @@ uses
 type
 
   TParams = Class
-    ParamsPanel: TPanel;
   Protected
     FillStyleParamName, LineColorParamName, LineWidthParamName, RadiusParamName, FillColorParamName : TLabel;
     FillStyleParam: TComboBox;
     LineColorParam, FillColorParam: TColorButton;
     LineWidthParam, RadiusParam: TSpinEdit;
     LineColorDialogParam, FillColorDialogParam: TColorDialog;
-    LineColor, FillColor: TColor;
-    LineWidth, RadiusW, RadiusH : Integer;
+
   Public
     Constructor Create(
       ALineColor: TColor;
@@ -26,17 +24,16 @@ type
       ALineWidth: Integer;
       AFillStyle: TBrushStyle;
       ARadiusW: Integer;
-      ARadiusH: Integer); Virtual; Abstract;
+      ARadiusH: Integer;
+      APanel: TPanel); Virtual; Abstract;
     procedure LineColorDialogClose(Sender: TObject);
     procedure FillColorDialogClose(Sender: TObject);
     procedure WidthChange(Sender: Tobject);
     procedure RadiusChange(Sender: TObject);
-
-
-
-
-
   end;
+
+
+
 
    TPolyLineParams = Class(TParams)
    Public
@@ -46,7 +43,8 @@ type
       ALineWidth: Integer;
       AFillStyle: TBrushStyle;
       ARadiusW: Integer;
-      ARadiusH: Integer); Override;
+      ARadiusH: Integer;
+      APanel: TPanel); Override;
    end;
 
   TLineParams = Class(TParams)
@@ -57,7 +55,8 @@ type
       ALineWidth: Integer;
       AFillStyle: TBrushStyle;
       ARadiusW: Integer;
-      ARadiusH: Integer); Override;
+      ARadiusH: Integer;
+      APanel: TPanel); Override;
    end;
 
    TRectangleParams = Class(TParams)
@@ -68,7 +67,8 @@ type
       ALineWidth: Integer;
       AFillStyle: TBrushStyle;
       ARadiusW: Integer;
-      ARadiusH: Integer); Override;
+      ARadiusH: Integer;
+      APanel: TPanel); Override;
    end;
 
    TElipseParams = Class(TParams)
@@ -79,7 +79,8 @@ type
       ALineWidth: Integer;
       AFillStyle: TBrushStyle;
       ARadiusW: Integer;
-      ARadiusH: Integer); Override;
+      ARadiusH: Integer;
+      APanel: TPanel); Override;
    end;
 
    TRoundRectParams = Class(TParams)
@@ -90,8 +91,14 @@ type
       ALineWidth: Integer;
       AFillStyle: TBrushStyle;
       ARadiusW: Integer;
-      ARadiusH: Integer); Override;
+      ARadiusH: Integer;
+      APanel: TPanel); Override;
    end;
+
+   var
+    LineColor, FillColor: TColor;
+    LineWidth, RadiusW, RadiusH : Integer;
+    FillStyle: TBrushStyle;
 
 
 implementation
@@ -118,12 +125,13 @@ implementation
    end;
 
    Constructor TPolyLineParams.Create( ALineColor: TColor; AFillColor: TColor;
-     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer);
+     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer;
+      APanel: TPanel);
    begin
-     LineColorDialogParam:= TColorDialog.Create(ParamsPanel);
+     LineColorDialogParam:= TColorDialog.Create(APanel);
      LineColorDialogParam.OnClose:= @LineColorDialogClose;
 
-     LineColorParam:= TColorButton.Create(ParamsPanel);
+     LineColorParam:= TColorButton.Create(APanel);
      With LineColorParam do
      begin
        Name:= 'LineColorParam';
@@ -132,9 +140,10 @@ implementation
        Width:= 77;
        Height:= 29;
        ButtonColor:= LineColor;
+       Parent:= APanel;
      end;
 
-     LineColorParamName:= TLabel.Create(ParamsPanel);
+     LineColorParamName:= TLabel.Create(APanel);
      With LineColorParamName do
      begin
        Name:= 'LineColorName';
@@ -142,9 +151,10 @@ implementation
        Width:= 76;
        Height:= 20;
        Caption:= 'Line Color';
+       Parent:= APanel;
      end;
 
-     LineWidthParam:= TSpinEdit.Create(ParamsPanel);
+     LineWidthParam:= TSpinEdit.Create(APanel);
      With LineWidthParam do
      begin
        Name:= 'LineWidth';
@@ -152,12 +162,13 @@ implementation
        Width:= 74;
        Height:= 23;
        Value:= LineWidth;
+       Parent:= APanel;
        MinValue:= 1;
        MaxValue:= 100;
        OnChange:=  @WidthChange;
      end;
 
-     LineWidthParamName:= TLabel.Create(ParamsPanel);
+     LineWidthParamName:= TLabel.Create(APanel);
      With LineWidthParamName do
      begin
        Name:= 'LineWidthName';
@@ -165,16 +176,18 @@ implementation
        Width:= 76;
        Height:= 20;
        Caption:= 'Line Width';
+       Parent:= APanel;
      end;
    end;
 
    Constructor TLineParams.Create( ALineColor: TColor; AFillColor: TColor;
-     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer);
+     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer;
+      APanel: TPanel);
    begin
-     LineColorDialogParam:= TColorDialog.Create(ParamsPanel);
+     LineColorDialogParam:= TColorDialog.Create(APanel);
      LineColorDialogParam.OnClose:= @LineColorDialogClose;
 
-     LineColorParam:= TColorButton.Create(ParamsPanel);
+     LineColorParam:= TColorButton.Create(APanel);
      With LineColorParam do
      begin
        Name:= 'LineColorParam';
@@ -183,9 +196,10 @@ implementation
        Width:= 77;
        Height:= 29;
        ButtonColor:= LineColor;
+       Parent:= APanel;
      end;
 
-     LineColorParamName:= TLabel.Create(ParamsPanel);
+     LineColorParamName:= TLabel.Create(APanel);
      With LineColorParamName do
      begin
        Name:= 'LineColorName';
@@ -193,42 +207,46 @@ implementation
        Width:= 76;
        Height:= 20;
        Caption:= 'Line Color';
+       Parent:= APanel;
      end;
 
-     LineWidthParam:= TSpinEdit.Create(ParamsPanel);
+     LineWidthParam:= TSpinEdit.Create(APanel);
      With LineWidthParam do
      begin
        Name:= 'LineWidth';
        Align:= AlBottom;
        Width:= 74;
        Height:= 23;
+       Parent:= APanel;
        Value:= LineWidth;
        MinValue:= 1;
        MaxValue:= 100;
        OnChange:=  @WidthChange;
      end;
 
-     LineWidthParamName:= TLabel.Create(ParamsPanel);
+     LineWidthParamName:= TLabel.Create(APanel);
      With LineWidthParamName do
      begin
        Name:= 'LineWidthName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Line Width';
      end;
    end;
 
    Constructor TRectangleParams.Create ( ALineColor: TColor; AFillColor: TColor;
-     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer);
+     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer;
+      APanel: TPanel);
    begin
-     LineColorDialogParam:= TColorDialog.Create(ParamsPanel);
+     LineColorDialogParam:= TColorDialog.Create(APanel);
      LineColorDialogParam.OnClose:= @LineColorDialogClose;
 
-     FillColorDialogParam:= TColorDialog.Create(ParamsPanel);
+     FillColorDialogParam:= TColorDialog.Create(APanel);
      FillColorDialogParam.OnClose:= @FillColorDialogClose;
 
-     LineColorParam:= TColorButton.Create(ParamsPanel);
+     LineColorParam:= TColorButton.Create(APanel);
      With LineColorParam do
      begin
        Name:= 'LineColorParam';
@@ -236,70 +254,77 @@ implementation
        Align:= AlBottom;
        Width:= 77;
        Height:= 29;
+       Parent:= APanel;
        ButtonColor:= LineColor;
      end;
 
-     LineColorParamName:= TLabel.Create(ParamsPanel);
+     LineColorParamName:= TLabel.Create(APanel);
      With LineColorParamName do
      begin
        Name:= 'LineColorName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Line Color';
      end;
 
-     LineWidthParam:= TSpinEdit.Create(ParamsPanel);
+     LineWidthParam:= TSpinEdit.Create(APanel);
      With LineWidthParam do
      begin
        Name:= 'LineWidth';
        Align:= AlBottom;
        Width:= 74;
        Height:= 23;
+       Parent:= APanel;
        Value:= LineWidth;
        MinValue:= 1;
        MaxValue:= 100;
        OnChange:=  @WidthChange;
      end;
 
-     LineWidthParamName:= TLabel.Create(ParamsPanel);
+     LineWidthParamName:= TLabel.Create(APanel);
      With LineWidthParamName do
      begin
        Name:= 'LineWidthName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Line Width';
      end;
 
-     FillColorParam:= TColorButton.Create(ParamsPanel);
+     FillColorParam:= TColorButton.Create(APanel);
      With FillColorParam Do
      begin
        Name:= 'FillColor';
        Align:=AlBottom;
        Width:= 77;
        Height:= 29;
+       Parent:= APanel;
        ButtonColor:= FillColor;
        ColorDialog:= FillColorDialogParam;
      end;
 
-     FillColorParamName:= TLabel.Create(ParamsPanel);
+     FillColorParamName:= TLabel.Create(APanel);
      With FillColorParamName do
      begin
        Name:= 'FillColorName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Fill Color';
      end;
 
-     FillStyleParam:= TComboBox.Create(ParamsPanel);
+     FillStyleParam:= TComboBox.Create(APanel);
      With FillStyleParam do
      begin
        Name:= 'FillStyle';
        Align:= AlBottom;
        Width:= 76;
        Height:= 23;
+       Parent:= APanel;
        //
        //
        //
@@ -309,13 +334,14 @@ implementation
        //
      end;
 
-     FillStyleParamName:= TLabel.Create(ParamsPanel);
+     FillStyleParamName:= TLabel.Create(APanel);
      With FillStyleParamName do
      begin
        Name:= 'FillStyleName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Fill Style';
      end;
 
@@ -323,15 +349,16 @@ implementation
    end;
 
    Constructor TElipseParams.Create ( ALineColor: TColor; AFillColor: TColor;
-     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer);
+     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer;
+      APanel: TPanel);
    begin
-     LineColorDialogParam:= TColorDialog.Create(ParamsPanel);
+     LineColorDialogParam:= TColorDialog.Create(APanel);
      LineColorDialogParam.OnClose:= @LineColorDialogClose;
 
-     FillColorDialogParam:= TColorDialog.Create(ParamsPanel);
+     FillColorDialogParam:= TColorDialog.Create(APanel);
      FillColorDialogParam.OnClose:= @FillColorDialogClose;
 
-     LineColorParam:= TColorButton.Create(ParamsPanel);
+     LineColorParam:= TColorButton.Create(APanel);
      With LineColorParam do
      begin
        Name:= 'LineColorParam';
@@ -339,20 +366,22 @@ implementation
        Align:= AlBottom;
        Width:= 77;
        Height:= 29;
+       Parent:= APanel;
        ButtonColor:= LineColor;
      end;
 
-     LineColorParamName:= TLabel.Create(ParamsPanel);
+     LineColorParamName:= TLabel.Create(APanel);
      With LineColorParamName do
      begin
        Name:= 'LineColorName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Line Color';
      end;
 
-     LineWidthParam:= TSpinEdit.Create(ParamsPanel);
+     LineWidthParam:= TSpinEdit.Create(APanel);
      With LineWidthParam do
      begin
        Name:= 'LineWidth';
@@ -362,47 +391,52 @@ implementation
        Value:= LineWidth;
        MinValue:= 1;
        MaxValue:= 100;
+       Parent:= APanel;
        OnChange:=  @WidthChange;
      end;
 
-     LineWidthParamName:= TLabel.Create(ParamsPanel);
+     LineWidthParamName:= TLabel.Create(APanel);
      With LineWidthParamName do
      begin
        Name:= 'LineWidthName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Line Width';
      end;
 
-     FillColorParam:= TColorButton.Create(ParamsPanel);
+     FillColorParam:= TColorButton.Create(APanel);
      With FillColorParam Do
      begin
        Name:= 'FillColor';
        Align:=AlBottom;
        Width:= 77;
        Height:= 29;
+       Parent:= APanel;
        ButtonColor:= FillColor;
        ColorDialog:= FillColorDialogParam;
      end;
 
-     FillColorParamName:= TLabel.Create(ParamsPanel);
+     FillColorParamName:= TLabel.Create(APanel);
      With FillColorParamName do
      begin
        Name:= 'FillColorName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Fill Color';
      end;
 
-     FillStyleParam:= TComboBox.Create(ParamsPanel);
+     FillStyleParam:= TComboBox.Create(APanel);
      With FillStyleParam do
      begin
        Name:= 'FillStyle';
        Align:= AlBottom;
        Width:= 76;
        Height:= 23;
+       Parent:= APanel;
        //
        //
        //
@@ -412,48 +446,52 @@ implementation
        //
      end;
 
-     FillStyleParamName:= TLabel.Create(ParamsPanel);
+     FillStyleParamName:= TLabel.Create(APanel);
      With FillStyleParamName do
      begin
        Name:= 'FillStyleName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Fill Style';
      end;
    end;
 
    Constructor TRoundRectParams.Create ( ALineColor: TColor; AFillColor: TColor;
-     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer);
+     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer;
+      APanel: TPanel);
    begin
-     LineColorDialogParam:= TColorDialog.Create(ParamsPanel);
+     LineColorDialogParam:= TColorDialog.Create(APanel);
      LineColorDialogParam.OnClose:= @LineColorDialogClose;
 
-     FillColorDialogParam:= TColorDialog.Create(ParamsPanel);
+     FillColorDialogParam:= TColorDialog.Create(APanel);
      FillColorDialogParam.OnClose:= @FillColorDialogClose;
 
-     LineColorParam:= TColorButton.Create(ParamsPanel);
+     LineColorParam:= TColorButton.Create(APanel);
      With LineColorParam do
      begin
        Name:= 'LineColorParam';
        ColorDialog:= LineColorDialogParam;
        Align:= AlBottom;
        Width:= 77;
+       Parent:= APanel;
        Height:= 29;
        ButtonColor:= LineColor;
      end;
 
-     LineColorParamName:= TLabel.Create(ParamsPanel);
+     LineColorParamName:= TLabel.Create(APanel);
      With LineColorParamName do
      begin
        Name:= 'LineColorName';
        Align:= AlBottom;
        Width:= 76;
+       Parent:= APanel;
        Height:= 20;
        Caption:= 'Line Color';
      end;
 
-     LineWidthParam:= TSpinEdit.Create(ParamsPanel);
+     LineWidthParam:= TSpinEdit.Create(APanel);
      With LineWidthParam do
      begin
        Name:= 'LineWidth';
@@ -463,47 +501,52 @@ implementation
        Value:= LineWidth;
        MinValue:= 1;
        MaxValue:= 100;
+       Parent:= APanel;
        OnChange:=  @WidthChange;
      end;
 
-     LineWidthParamName:= TLabel.Create(ParamsPanel);
+     LineWidthParamName:= TLabel.Create(APanel);
      With LineWidthParamName do
      begin
        Name:= 'LineWidthName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Line Width';
      end;
 
-     FillColorParam:= TColorButton.Create(ParamsPanel);
+     FillColorParam:= TColorButton.Create(APanel);
      With FillColorParam Do
      begin
        Name:= 'FillColor';
        Align:=AlBottom;
        Width:= 77;
        Height:= 29;
+       Parent:= APanel;
        ButtonColor:= FillColor;
        ColorDialog:= FillColorDialogParam;
      end;
 
-     FillColorParamName:= TLabel.Create(ParamsPanel);
+     FillColorParamName:= TLabel.Create(APanel);
      With FillColorParamName do
      begin
        Name:= 'FillColorName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Fill Color';
      end;
 
-     FillStyleParam:= TComboBox.Create(ParamsPanel);
+     FillStyleParam:= TComboBox.Create(APanel);
      With FillStyleParam do
      begin
        Name:= 'FillStyle';
        Align:= AlBottom;
        Width:= 76;
        Height:= 23;
+       Parent:= APanel;
        //
        //
        //
@@ -513,22 +556,24 @@ implementation
        //
      end;
 
-     FillStyleParamName:= TLabel.Create(ParamsPanel);
+     FillStyleParamName:= TLabel.Create(APanel);
      With FillStyleParamName do
      begin
        Name:= 'FillStyleName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Fill Style';
      end;
 
-     RadiusParam:= TSpinEdit.Create(ParamsPanel);
+     RadiusParam:= TSpinEdit.Create(APanel);
      With RadiusParam do
      begin
        Name:= 'Radius';
        Align:= AlBottom;
        Width:= 74;
+       Parent:= APanel;
        Height:= 23;
        MaxValue:= 100;
        MinValue:= 1;
@@ -536,13 +581,14 @@ implementation
        OnChange:= @RadiusChange;
      end;
 
-     RadiusParamName:= TLabel.Create(ParamsPanel);
+     RadiusParamName:= TLabel.Create(APanel);
      With RadiusParamName do
      begin
        Name:= 'RadiusStyleName';
        Align:= AlBottom;
        Width:= 76;
        Height:= 20;
+       Parent:= APanel;
        Caption:= 'Radius';
      end;
 
