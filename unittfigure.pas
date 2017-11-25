@@ -93,7 +93,7 @@ Constructor TFigures.Create(X,Y: Integer; ALineColor:Tcolor; AFillColor: TColor;
   ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer) ;
 begin
   SetLength(Points, 2);
-  Points[0]:= WPoint((x / scale - (Offset.x * 2))   , (y / scale - (Offset.y * 2)));
+  Points[0]:= WPoint((x / (scale * scale)  - (Offset.x * 2))  , (y / (scale * scale) - (Offset.y * 2)));
   Points[1]:= Points[0];
   LineColor:= ALineColor;
   FillColor:= AFillColor;
@@ -119,7 +119,7 @@ end;
 procedure TPolyline.MouseMove(X, Y: Integer);
 begin
   SetLength(Points, Length(Points) + 1);
-  Points[High(Points)]:= WPoint(X - Offset.x,Y - Offset.y);
+  Points[High(Points)]:= WPoint(X / scale - Offset.x, Y / scale - Offset.y);
 end;
 
  {Line}
@@ -137,7 +137,7 @@ end;
 
 procedure TLine.MouseMove(X, Y: Integer);
 begin
-  Points[High(Points)]:= WPoint(X - Offset.x,Y - Offset.y);
+  Points[High(Points)]:= WPoint(X / scale - Offset.x, Y / scale - Offset.y);
 end;
 
  {Rectangle}
@@ -158,7 +158,7 @@ end;
 
 procedure TRectangle.MouseMove(X, Y:Integer);
 begin
-  Points[High(Points)]:= WPoint(X - Offset.x,Y - Offset.y);
+  Points[High(Points)]:= WPoint(X / scale - Offset.x, Y / scale - Offset.y);
 end;
 
  {TEllipse}
@@ -179,7 +179,7 @@ end;
 
 procedure TEllipse.MouseMove(X, Y:integer);
 Begin
-  Points[High(Points)]:= WPoint(X - Offset.x,Y - Offset.y);
+  Points[High(Points)]:= WPoint(X / scale - Offset.x, Y / scale - Offset.y);
 end;
 
  {TRoundRect}
@@ -200,7 +200,7 @@ end;
 
 procedure TRoundRect.MouseMove(X, Y:integer);
 Begin
-  Points[high(Points)]:= WPoint(X - Offset.x,Y - Offset.y);
+  Points[high(Points)]:= WPoint(X / scale - Offset.x, Y / scale  - Offset.y);
 end;
 
 initialization

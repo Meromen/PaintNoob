@@ -41,8 +41,8 @@ implementation
 
 function OffSetXY(x1,y1: Integer; x2,y2, x3,y3: Double): TPoint;
 begin
-  Offset.x := x1 + Round(x2 - x3);
-  Offset.y := y1 + Round(y2 - y3);
+  Offset.x := (x1 + Round(x2 - x3)) ;
+  Offset.y := (y1 + Round(y2 - y3)) ;
   Result.x:=  Offset.x ;
   Result.y:=  Offset.y ;
 end;
@@ -56,12 +56,12 @@ end;
 
 function ScreenToWorldX(X: Integer): Double;
 begin
-   Result:= (Offset.X - X) / scale ;
+   Result:= (Offset.X - X)  ;
 end;
 
 function ScreenToWorldY(Y: Integer): Double;
 begin
-   Result:= (Offset.Y - Y) / scale;
+   Result:= (Offset.Y - Y) ;
 end;
 
 function ScreenToWorld(SPoint: ScreenPoint): WorldPoint;
