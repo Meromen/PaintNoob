@@ -18,7 +18,7 @@ Protected
 Public
   constructor Create(X,Y: Integer);
   procedure MouseMove(X, Y: Integer; ALastOffset: Tpoint); Virtual; Abstract;
-  procedure MouseDown(Sender: TObject; Button: TMouseButton; X, Y: Integer); Virtual; Abstract;
+  procedure MouseUp(Button: TMouseButton; X,Y:integer); Virtual; Abstract;
   procedure Draw(Acanvas: TCanvas); Virtual; Abstract;
 end;
 
@@ -26,13 +26,14 @@ end;
 TMagnifier = Class (TTool)
 Public
 procedure MouseMove(X, Y: Integer; ALastOFfset: TPoint); Override;
-procedure MouseDown(Sender: TObject; Button: TMouseButton; X, Y: Integer); Override;
+procedure MouseUp(Button: TMouseButton; X,Y:integer);  Override;
 end;
 
  {THand}
 THand = Class (TTool)
 Public
 procedure MouseMove(X, Y: Integer; ALastOffset: TPoint); Override;
+procedure MouseUp(Button: TMouseButton; X,Y:integer);  Override;
 end;
 
 
@@ -64,11 +65,17 @@ end;
 
 
  {TMagnifier}
-procedure TMagnifier.MouseDown(Sender: TObject; Button: TMouseButton; X, Y: Integer);
+procedure TMagnifier.MouseUp(Button: TMouseButton; X,Y:integer);
 begin
-  if Button = mbLeft then
-  begin
-    scale:= Scale*2;
+  case Button of
+    mbLeft:
+      begin
+        Zoom(Point(X,Y), scale*2);
+      end;
+    mbRight:
+      begin
+        Zoom(Point(X,Y), scale/2);
+      end;
   end;
 end;
 
@@ -78,6 +85,11 @@ begin
 end;
 
  {THand}
+procedure THand.MouseUp(Button: TMouseButton; X,Y:integer);
+begin
+
+end;
+
 procedure THand.MouseMove(X, Y: Integer; ALastOffset: TPoint);
 begin
   Points[1]:= Wpoint(x, y);

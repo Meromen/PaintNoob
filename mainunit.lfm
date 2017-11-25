@@ -1,7 +1,7 @@
 object PaintForm: TPaintForm
-  Left = 766
+  Left = 593
   Height = 707
-  Top = 209
+  Top = 133
   Width = 825
   Caption = 'Paint(no)'
   ClientHeight = 687
@@ -39,6 +39,7 @@ object PaintForm: TPaintForm
       Width = 73
       MaxValue = 1600
       MinValue = 1
+      OnChange = SpinEdit1Change
       TabOrder = 0
       Value = 1
     end
@@ -49,6 +50,38 @@ object PaintForm: TPaintForm
       Width = 76
       Align = alBottom
       TabOrder = 1
+    end
+    object Label1: TLabel
+      Left = 4
+      Height = 15
+      Top = 238
+      Width = 34
+      Caption = 'Label1'
+      ParentColor = False
+    end
+    object Label2: TLabel
+      Left = 6
+      Height = 15
+      Top = 256
+      Width = 34
+      Caption = 'Label2'
+      ParentColor = False
+    end
+    object Label3: TLabel
+      Left = 8
+      Height = 15
+      Top = 275
+      Width = 34
+      Caption = 'Label3'
+      ParentColor = False
+    end
+    object Label4: TLabel
+      Left = 12
+      Height = 15
+      Top = 294
+      Width = 34
+      Caption = 'Label4'
+      ParentColor = False
     end
   end
   object HScrollBar: TScrollBar
@@ -70,63 +103,9 @@ object PaintForm: TPaintForm
     PageSize = 0
     TabOrder = 2
   end
-  object FillColorDialog: TColorDialog
-    Color = clBlack
-    CustomColors.Strings = (
-      'ColorA=000000'
-      'ColorB=000080'
-      'ColorC=008000'
-      'ColorD=008080'
-      'ColorE=800000'
-      'ColorF=800080'
-      'ColorG=808000'
-      'ColorH=808080'
-      'ColorI=C0C0C0'
-      'ColorJ=0000FF'
-      'ColorK=00FF00'
-      'ColorL=00FFFF'
-      'ColorM=FF0000'
-      'ColorN=FF00FF'
-      'ColorO=FFFF00'
-      'ColorP=FFFFFF'
-      'ColorQ=C0DCC0'
-      'ColorR=F0CAA6'
-      'ColorS=F0FBFF'
-      'ColorT=A4A0A0'
-    )
-    left = 48
-    top = 312
-  end
-  object LineColorDialog: TColorDialog
-    Color = clBlack
-    CustomColors.Strings = (
-      'ColorA=000000'
-      'ColorB=000080'
-      'ColorC=008000'
-      'ColorD=008080'
-      'ColorE=800000'
-      'ColorF=800080'
-      'ColorG=808000'
-      'ColorH=808080'
-      'ColorI=C0C0C0'
-      'ColorJ=0000FF'
-      'ColorK=00FF00'
-      'ColorL=00FFFF'
-      'ColorM=FF0000'
-      'ColorN=FF00FF'
-      'ColorO=FFFF00'
-      'ColorP=FFFFFF'
-      'ColorQ=C0DCC0'
-      'ColorR=F0CAA6'
-      'ColorS=F0FBFF'
-      'ColorT=A4A0A0'
-    )
-    left = 78
-    top = 312
-  end
   object MainMenu1: TMainMenu
-    left = 65528
-    top = 312
+    left = 240
+    top = 224
     object MenuItem1: TMenuItem
       Caption = 'New Item1'
       object MenuItem2: TMenuItem
@@ -136,7 +115,7 @@ object PaintForm: TPaintForm
     end
   end
   object SaveDialog1: TSaveDialog
-    left = 22
-    top = 312
+    left = 200
+    top = 224
   end
 end

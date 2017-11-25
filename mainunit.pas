@@ -20,9 +20,11 @@ Type
   { TPaintForm }
 
   TPaintForm = class(TForm)
-    FillColorDialog: TColorDialog;
-    LineColorDialog: TColorDialog;
     DrawPlace: TPaintBox;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
@@ -42,6 +44,7 @@ Type
       Shift: TShiftState; X, Y: Integer);
     procedure DrawPlacePaint(Sender: TObject);
     procedure MenuItem2Click(Sender: TObject);
+    procedure SpinEdit1Change(Sender: TObject);
     procedure TRectangleClick(Sender: TObject);
     procedure TElipseClick(Sender: TObject);
     procedure TLineClick(Sender: TObject);
@@ -240,7 +243,6 @@ procedure TPaintForm.TMagnifierClick(Sender: TObject);
 begin
   FigureNow:= False;
   ToolNow:= True;
-
   CurrentTool:= ToolsList[(Sender as TSpeedButton).Tag-Length(FigureList)];
   ParamsPanel.DestroyComponents;
  end;
@@ -294,6 +296,10 @@ end;
 procedure TPaintForm.DrawPlaceMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
+  if ToolNow then begin
+    CanvasTools[High(CanvasTools)].MouseUp(Button,X,Y);
+    DrawPlace.Invalidate;
+  end;
   If Button = mbLeft then
   begin
     IsDrawing:= False;
@@ -333,6 +339,12 @@ begin
         bmp.Free;
       end;
     end;
+end;
+
+procedure TPaintForm.SpinEdit1Change(Sender: TObject);
+begin
+  scale:= SpinEdit1.Value / 100;
+  DrawPlace.Invalidate;
 end;
 
 

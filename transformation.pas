@@ -30,6 +30,7 @@ type
   function WPoint(X,Y: Double):WorldPoint;
   function OffSetXY(x1,y1:Integer; x2,y2,x3,y3:Double):Tpoint;
   function Offsetout():Tpoint;
+  procedure Zoom(Apoint: Tpoint; AScale: Double);
 
 
   var
@@ -113,8 +114,17 @@ begin
 end;
 
    {_______________________________________________________________________}
-    {THand}
 
+procedure Zoom(Apoint: Tpoint; AScale: Double);
+
+  var Point1, Point2: WorldPoint;
+begin
+Point1 := ScreenToWorld(APoint);
+scale:=Ascale;
+Point2 := ScreenToWorld(APoint);
+Offset.x := Offset.x - Round(Point2.x - Point1.x);
+Offset.y := Offset.y - Round(Point2.y - Point1.y);
+end;
 
 initialization
 
