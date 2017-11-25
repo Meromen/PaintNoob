@@ -18,14 +18,7 @@ type
     LineColorDialogParam, FillColorDialogParam: TColorDialog;
 
   Public
-    Constructor Create(
-      ALineColor: TColor;
-      AFillColor: TColor;
-      ALineWidth: Integer;
-      AFillStyle: TBrushStyle;
-      ARadiusW: Integer;
-      ARadiusH: Integer;
-      APanel: TPanel); Virtual; Abstract;
+    Constructor Create(APanel: TPanel); Virtual; Abstract;
     procedure LineColorDialogClose(Sender: TObject);
     procedure FillColorDialogClose(Sender: TObject);
     procedure WidthChange(Sender: Tobject);
@@ -37,62 +30,27 @@ type
 
    TPolyLineParams = Class(TParams)
    Public
-    Constructor Create(
-      ALineColor: TColor;
-      AFillColor: TColor;
-      ALineWidth: Integer;
-      AFillStyle: TBrushStyle;
-      ARadiusW: Integer;
-      ARadiusH: Integer;
-      APanel: TPanel); Override;
+    Constructor Create(APanel: TPanel); Override;
    end;
 
   TLineParams = Class(TParams)
   Public
-    Constructor Create(
-      ALineColor: TColor;
-      AFillColor: TColor;
-      ALineWidth: Integer;
-      AFillStyle: TBrushStyle;
-      ARadiusW: Integer;
-      ARadiusH: Integer;
-      APanel: TPanel); Override;
+    Constructor Create(APanel: TPanel); Override;
    end;
 
    TRectangleParams = Class(TParams)
    Public
-    Constructor Create(
-      ALineColor: TColor;
-      AFillColor: TColor;
-      ALineWidth: Integer;
-      AFillStyle: TBrushStyle;
-      ARadiusW: Integer;
-      ARadiusH: Integer;
-      APanel: TPanel); Override;
+    Constructor Create(APanel: TPanel); Override;
    end;
 
    TElipseParams = Class(TParams)
    Public
-    Constructor Create(
-      ALineColor: TColor;
-      AFillColor: TColor;
-      ALineWidth: Integer;
-      AFillStyle: TBrushStyle;
-      ARadiusW: Integer;
-      ARadiusH: Integer;
-      APanel: TPanel); Override;
+    Constructor Create(APanel: TPanel); Override;
    end;
 
    TRoundRectParams = Class(TParams)
    Public
-    Constructor Create(
-      ALineColor: TColor;
-      AFillColor: TColor;
-      ALineWidth: Integer;
-      AFillStyle: TBrushStyle;
-      ARadiusW: Integer;
-      ARadiusH: Integer;
-      APanel: TPanel); Override;
+    Constructor Create(APanel: TPanel); Override;
    end;
 
    var
@@ -124,9 +82,7 @@ implementation
      LineWidth:= LineWidthParam.Value;
    end;
 
-   Constructor TPolyLineParams.Create( ALineColor: TColor; AFillColor: TColor;
-     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer;
-      APanel: TPanel);
+   Constructor TPolyLineParams.Create(APanel: TPanel);
    begin
      LineColorDialogParam:= TColorDialog.Create(APanel);
      LineColorDialogParam.OnClose:= @LineColorDialogClose;
@@ -180,9 +136,7 @@ implementation
      end;
    end;
 
-   Constructor TLineParams.Create( ALineColor: TColor; AFillColor: TColor;
-     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer;
-      APanel: TPanel);
+   Constructor TLineParams.Create(APanel: TPanel);
    begin
      LineColorDialogParam:= TColorDialog.Create(APanel);
      LineColorDialogParam.OnClose:= @LineColorDialogClose;
@@ -236,9 +190,7 @@ implementation
      end;
    end;
 
-   Constructor TRectangleParams.Create ( ALineColor: TColor; AFillColor: TColor;
-     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer;
-      APanel: TPanel);
+   Constructor TRectangleParams.Create (APanel: TPanel);
    begin
      LineColorDialogParam:= TColorDialog.Create(APanel);
      LineColorDialogParam.OnClose:= @LineColorDialogClose;
@@ -348,9 +300,7 @@ implementation
 
    end;
 
-   Constructor TElipseParams.Create ( ALineColor: TColor; AFillColor: TColor;
-     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer;
-      APanel: TPanel);
+   Constructor TElipseParams.Create (APanel: TPanel);
    begin
      LineColorDialogParam:= TColorDialog.Create(APanel);
      LineColorDialogParam.OnClose:= @LineColorDialogClose;
@@ -458,9 +408,7 @@ implementation
      end;
    end;
 
-   Constructor TRoundRectParams.Create ( ALineColor: TColor; AFillColor: TColor;
-     ALineWidth: integer; AFillStyle: TBrushStyle; ARadiusW: Integer; ARadiusH: Integer;
-      APanel: TPanel);
+   Constructor TRoundRectParams.Create (APanel: TPanel);
    begin
      LineColorDialogParam:= TColorDialog.Create(APanel);
      LineColorDialogParam.OnClose:= @LineColorDialogClose;

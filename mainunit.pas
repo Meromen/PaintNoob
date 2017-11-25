@@ -21,10 +21,6 @@ Type
 
   TPaintForm = class(TForm)
     DrawPlace: TPaintBox;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
@@ -184,7 +180,7 @@ begin
 
   CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
   ParamsPanel.DestroyComponents;
-  TRectangleParams.Create(LineColor, FillColor, LineWidth, FillStyle, RadiusH, RadiusW, ParamsPanel );
+  TRectangleParams.Create(ParamsPanel );
 end;
 
 procedure TPaintForm.TElipseClick(Sender: TObject);
@@ -194,7 +190,7 @@ begin
 
   CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
   ParamsPanel.DestroyComponents;
-  TElipseParams.Create(LineColor, FillColor, LineWidth, FillStyle, RadiusH, RadiusW, ParamsPanel );
+  TElipseParams.Create(ParamsPanel );
 end;
 
 procedure TPaintForm.TRoundRectClick(Sender: TObject);
@@ -205,7 +201,7 @@ begin
   ToolNow:= False;
 
   ParamsPanel.DestroyComponents;
-  TRoundRectParams.Create(LineColor, FillColor, LineWidth, FillStyle, RadiusH, RadiusW, ParamsPanel );
+  TRoundRectParams.Create(ParamsPanel );
 end;
 
 procedure TPaintForm.TPolyLineClick(Sender: TObject);
@@ -215,7 +211,7 @@ begin
 
   CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
   ParamsPanel.DestroyComponents;
-  TPolyLineParams.Create(LineColor, FillColor, LineWidth, FillStyle, RadiusH, RadiusW, ParamsPanel );
+  TPolyLineParams.Create(ParamsPanel );
 end;
 
 procedure TPaintForm.TLineClick(Sender: TObject);
@@ -226,7 +222,7 @@ begin
   CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
 
   ParamsPanel.DestroyComponents;
-  TLineParams.Create(LineColor, FillColor, LineWidth, FillStyle, RadiusH, RadiusW, ParamsPanel );
+  TLineParams.Create(ParamsPanel );
 end;
 
 procedure TPaintForm.THandClick(Sender: TObject);
