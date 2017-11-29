@@ -68,6 +68,7 @@ type
 
    const
      LineWidthLabel = 'Pen Width';
+     PenStyleLabel  = 'Pen Style';
      LineColorLabel = 'Pen Color';
      FillColorLabel = 'Fill Color';
      FillStyleLabel = 'Fill Style';
@@ -98,6 +99,7 @@ type
     MLineColor, MFillColor: TColor;
     MLineWidth, MRadiusW, MRadiusH : Integer;
     MFillStyle: TBrushStyle;
+    MLineStyle: TPenStyle;
 
 
 implementation
