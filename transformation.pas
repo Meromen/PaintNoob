@@ -126,11 +126,11 @@ procedure Zoom(Apoint: Tpoint; AScale: Double);
 var
   Point1, Point2: WorldPoint;
 begin
-Point1 := ScreenToWorld(APoint);
-scale:=Ascale;
-Point2 := ScreenToWorld(APoint);
-Offset.x := Offset.x - Round(Point2.x - Point1.x);
-Offset.y := Offset.y - Round(Point2.y - Point1.y);
+ Point1 := ScreenToWorld(APoint);
+ SetScale(Ascale);
+ Point2 := ScreenToWorld(APoint);
+ Offset.x := Offset.x - Round(Point2.x - Point1.x);
+ Offset.y := Offset.y - Round(Point2.y - Point1.y);
 end;
 
 procedure SetScale(AScale: double);

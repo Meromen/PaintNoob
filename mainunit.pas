@@ -86,6 +86,8 @@ begin
   MRadiusW:= 10;
   SpinEdit1.Value:= 100;
   IsDrawing:= false;
+  PBHeight:= DrawPlace.Height;
+  PBWidth:= DrawPlace.Width;
 
 
 for i:= 0 to High(ToolsList) do

@@ -117,11 +117,13 @@ begin
     LineColor:= MLineColor;
     FillColor:= MFillColor;
     FillStyle:= MFillStyle;
+    PenStyle:= MLineStyle;
     WRadius:= MRadiusW;
     HRadius:= MRadiusH;
 
   for p in Params do
     case p.ParamLabel.Caption of
+      PenStyleLabel: PenStyle:= (p as TPenStyleParams).Param;
       LineWidthLabel: LineWidth:= (p as TSpinParams).Param;
       LineColorLabel: LineColor:= (p as TColorParams).Param;
       FillColorLabel: FillColor:= (p as TColorParams).Param;
@@ -176,15 +178,16 @@ var
 begin
   i:= High(Params);
   SetLength(Params, Length(Params) + 2);
-  Params[i + 2]:= TColorParams.Create(APanel, LineColorLabel, MLineColor);
-  Params[i + 1]:= TSpinParams.Create(APanel, LineWidthLabel, MLineWidth);
+  Params[i + 1]:= TPenStyleParams.Create(APanel, PenStyleLabel, MLineStyle);
+  Params[i + 3]:= TColorParams.Create(APanel, LineColorLabel, MLineColor);
+  Params[i + 2]:= TSpinParams.Create(APanel, LineWidthLabel, MLineWidth);
 end;
 
 procedure TTool.AddBrushParams(APanel: TPanel);
 var
   i: integer;
 begin
-  i := High(Params); SetLength(Params, Length(Params) + 2);
+  i := High(Params); SetLength(Params, Length(Params) + 3);
   Params[i + 2]:= TColorParams.Create(APanel, FillColorLabel, MFillColor);
   Params[i + 1]:= TBrushStyleParams.Create(APanel, FillStyleLabel, MFillStyle);
 end;
@@ -287,18 +290,35 @@ end;
 
  {TMagnifier}
 procedure TMagnifier.MouseUp(Button: TMouseButton; X,Y:integer);
+var
+  TopLeft, BottomRight: WorldPoint;
+  NewScale: double;
 begin
   case Button of
+    mbRight: Zoom(Point(X,Y), scale - 0.5);
     mbLeft:
       begin
-        Zoom(Point(X,Y), scale*2);
-      end;
-    mbRight:
-      begin
-        Zoom(Point(X,Y), scale/2);
-      end;
+        with CanvasFigures[High(CanvasFigures)] do
+          begin
+            TopLeft:= FindTopLeft;
+            BottomRight:= FindBottomRight;
+          end;
+        if (sqr(TopLeft.x - BottomRight.x) + sqr(TopLeft.y - BottomRight.y) < 16*16) then
+           Zoom(Point(X, Y), Scale + 0.5)
+        else
+          begin
+            NewScale := Scale * Min(PBWidth / Scale / (BottomRight.x - TopLeft.x),
+                        PBHeight / Scale / (BottomRight.y - TopLeft.y));
+            Zoom(WorldToScreen(WPoint((TopLeft.x + BottomRight.x) / 2,
+                (TopLeft.y + BottomRight.y) / 2)), NewScale);
+            inherited;
+          end;
+        SetLength(CanvasFigures, Length(CanvasFigures) - 1);
+       end;
   end;
 end;
+
+
 
 
  {THand}
