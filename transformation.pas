@@ -28,19 +28,19 @@ type
   function WorldToScreenX (X: Double): Integer;
   function WorldToScreenY (Y: Double): Integer;
   function WPoint(X,Y: Double):WorldPoint;
-  function OffSetXY(x1,y1:Integer; x2,y2,x3,y3:Double):Tpoint;
-  function Offsetout():Tpoint;
+ {function OffSetXY(x1,y1:Integer; x2,y2,x3,y3:Double):Tpoint;
+  function Offsetout():Tpoint;   }
   procedure Zoom(Apoint: Tpoint; AScale: Double);
 
 
   var
     scale:Double;
-    Offset:TPoint;
+    Offset:WorldPoint;
 
 
 implementation
 
-function OffSetXY(x1,y1: Integer; x2,y2, x3,y3: Double): TPoint;
+{function OffSetXY(x1,y1: Integer; x2,y2, x3,y3: Double): TPoint;
 begin
   Offset.x := (x1 + Round(x2 - x3)) ;
   Offset.y := (y1 + Round(y2 - y3)) ;
@@ -50,19 +50,19 @@ end;
 function Offsetout():TPoint;
 begin
   Result:= Offset;
-end;
+end;    }
 
 
    {Преобразование в Мировые}
 
 function ScreenToWorldX(X: Integer): Double;
 begin
-   Result:= (Offset.X - X)  ;
+   Result:= X / scale + Offset.x;
 end;
 
 function ScreenToWorldY(Y: Integer): Double;
 begin
-   Result:= (Offset.Y - Y) ;
+   Result:= Y / scale + Offset.y;
 end;
 
 function ScreenToWorld(SPoint: ScreenPoint): WorldPoint;
@@ -84,12 +84,12 @@ end;
 
 function WorldToScreenX(X: Double): Integer;
 begin
-  Result:= round((X + Offset.X) * scale );
+  Result:= round((X - Offset.X) * scale );
 end;
 
 function WorldToScreenY(Y: Double): Integer;
 begin
-  Result:= round((Y  + Offset.Y) * scale );
+  Result:= round((Y  - Offset.Y) * scale );
 end;
 
 function WorldToScreen(WPoint: WorldPoint): ScreenPoint;
@@ -128,7 +128,7 @@ end;
 
 initialization
 
-Offset:= Point(0,0);
+Offset:= WPoint(0,0);
 scale:= 1;
 
 
