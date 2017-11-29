@@ -31,11 +31,16 @@ type
  {function OffSetXY(x1,y1:Integer; x2,y2,x3,y3:Double):Tpoint;
   function Offsetout():Tpoint;   }
   procedure Zoom(Apoint: Tpoint; AScale: Double);
+  procedure SetScale(AScale: double);
 
+  const
+  MinScale = 0.01;
+  MaxScale = 50;
 
   var
     scale:Double;
     Offset:WorldPoint;
+    PBWidth, PBHeight: integer;
 
 
 implementation
@@ -115,15 +120,27 @@ end;
 
    {_______________________________________________________________________}
 
-procedure Zoom(Apoint: Tpoint; AScale: Double);
+   {Zoom}
 
-  var Point1, Point2: WorldPoint;
+procedure Zoom(Apoint: Tpoint; AScale: Double);
+var
+  Point1, Point2: WorldPoint;
 begin
 Point1 := ScreenToWorld(APoint);
 scale:=Ascale;
 Point2 := ScreenToWorld(APoint);
 Offset.x := Offset.x - Round(Point2.x - Point1.x);
 Offset.y := Offset.y - Round(Point2.y - Point1.y);
+end;
+
+procedure SetScale(AScale: double);
+begin
+  if AScale > MaxScale then
+    Scale:= MaxScale
+  else if AScale < MinScale then
+    Scale:= MinScale
+  else
+    Scale:= AScale;
 end;
 
 initialization
