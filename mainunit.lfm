@@ -1,7 +1,7 @@
 object PaintForm: TPaintForm
-  Left = 593
+  Left = 824
   Height = 707
-  Top = 133
+  Top = 238
   Width = 825
   Caption = 'Paint(no)'
   ClientHeight = 687
@@ -17,7 +17,6 @@ object PaintForm: TPaintForm
     Align = alClient
     Color = clWindow
     ParentColor = False
-    OnClick = DrawPlaceClick
     OnMouseDown = DrawPlaceMouseDown
     OnMouseMove = DrawPlaceMouseMove
     OnMouseUp = DrawPlaceMouseUp

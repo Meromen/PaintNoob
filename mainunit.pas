@@ -31,7 +31,6 @@ Type
     HScrollBar: TScrollBar;
     VScrollBar: TScrollBar;
     PanelForAll: TPanel;
-    procedure DrawPlaceClick(Sender: TObject);
     procedure DrawPlaceMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure DrawPlaceMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -41,13 +40,6 @@ Type
     procedure DrawPlacePaint(Sender: TObject);
     procedure MenuItem2Click(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
-    procedure TRectangleClick(Sender: TObject);
-    procedure TElipseClick(Sender: TObject);
-    procedure TLineClick(Sender: TObject);
-    procedure TPolyLineClick(Sender: TObject);
-    procedure TRoundRectClick(Sender: TObject);
-    procedure THandClick(Sender: TObject);
-    procedure TMagnifierClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ToolsButClick(Sender: TObject);
 
@@ -62,25 +54,12 @@ var
   PaintForm: TPaintForm;
   CurrentFillColor, CurrentLineColor: TColor;
   CurrentLineWidth, CurrentFillStyle, CurrentRadius: Integer;
-  CanvasFigures: Array of TFigures;
   CanvasTools: Array of TTool;
-  CurrentFigure: TFigureClass;
-  CurrentTool: TToolClass;
+  CurrentTool: TTool;
   Offset1: Tpoint;
   LastOffset: TPoint;
-
   IsDrawing: Boolean;
-  FigureNow: Boolean;
-  ToolNow: Boolean;
-  FillStyles: array[0..3] of TFillStyleItem =
-    ( ( Name: 'Clear';
-        BrushStyle: bsClear),
-      ( Name: 'Solid';
-        BrushStyle: bsSolid),
-      ( Name: 'Horizontal';
-        BrushStyle: bsHorizontal),
-      ( Name: 'Vertical' ;
-        BrushStyle: bsVertical ) );
+
 
 
 implementation
@@ -97,151 +76,45 @@ const
 procedure TPaintForm.FormCreate(Sender: TObject);
 var
   MyButton: TSpeedButton;
-  CurrentIcon: TPicture;
-
-  FillStylesList: TFillStyleItem;
   i: Integer;
+
 begin
-  FillStyle:= bsSolid;
-  LineWidth:= 1;
-  FillColor:= clWhite;
-  LineColor:= clBlack;
-  RadiusW:= 10;
+  MFillStyle:= bsSolid;
+  MLineWidth:= 1;
+  MFillColor:= clWhite;
+  MLineColor:= clBlack;
+  MRadiusW:= 10;
   SpinEdit1.Value:= 100;
   IsDrawing:= false;
 
-for i:= 0 to High(FigureList)do
+
+for i:= 0 to High(ToolsList) do
   begin
+    ToolsList[i].CreateParams(ParamsPanel);
     MyButton:= TSpeedButton.Create(PanelForAll);
     MyButton.Parent:= PanelForAll;
-    MyButton.Name:= 'Button' + FigureList[i].ClassName;
+    MyButton.Name:= 'Button' + ToolsList[i].ClassName;
     MyButton.Tag:= i;
-    MyButton.Color:= clBlack;
     MyButton.OnClick:= @ToolsButClick;
-
-    CurrentIcon:= TPicture.Create;
-    CurrentIcon.LoadFromFile(FigureList[i].ClassName + '.ico');
-    MyButton.Glyph:= CurrentIcon.Bitmap;
-
+    MyButton.Glyph:= ToolsList[i].Bitmap.Bitmap;
     MyButton.Width:= ButtonSize;
     MyButton.Height:= ButtonSize;
     MyButton.Left:= (i mod 2) * (ButtonSize + 12);
     MyButton.Top:= (i div 2) * (ButtonSize + 5);
   end;
 
-for i:= 0 to High(ToolsList) do
-  begin
-    MyButton:= TSpeedButton.Create(PanelForAll);
-    MyButton.Parent:= PanelForAll;
-    MyButton.Name:= 'Button' + ToolsList[i].ClassName;
-    MyButton.Tag:= Length(FigureList) + i;
-    MyButton.Color:= clBlack;
-    MyButton.OnClick:= @ToolsButClick;
-
-    CurrentIcon:= TPicture.Create;
-    CurrentIcon.LoadFromFile(ToolsList[i].ClassName + '.ico');
-    MyButton.Glyph:= CurrentIcon.Bitmap;
-
-    MyButton.Width:= ButtonSize;
-    MyButton.Height:= ButtonSize;
-    MyButton.Left:= ((Length(FigureList)+i) mod 2) * (ButtonSize + 12);
-    MyButton.Top:= ((Length(FigureList)+i) div 2) * (ButtonSize + 5);
-  end;
-
-{for FillStylesList in FillStyles do
-  FillStyle.Items.Add(FillStylesList.Name);
-  FillStyle.ItemIndex:= 0; }
-
-CurrentFigure:= FigureList[0];
-FigureNow:= True;
-ToolNow:= False;
+CurrentTool:= ToolsList[0];
+CurrentTool.ShowParameters;
 end;
 
 
 procedure TPaintForm.ToolsButClick(Sender: TObject);
 begin
-//CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
-
-  Case (Sender as TSpeedButton).Tag of
-  0: TPolyLineClick(Sender);
-  1: TElipseClick(Sender);
-  2: TLineClick(Sender);
-  3: TRectangleClick(Sender);
-  4: TRoundRectClick(Sender);
-  5: THandClick(Sender);
-  6: TMagnifierClick(Sender);
-  end;
+  CurrentTool.HideParameters;
+  CurrentTool:= ToolsList[(Sender as TSpeedButton).Tag];
+  CurrentTool.ShowParameters;
 end;
 
-procedure TPaintForm.TRectangleClick(Sender: TObject);
-begin
-  FigureNow:= True;
-  ToolNow:= False;
-
-  CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
-  ParamsPanel.DestroyComponents;
-  TRectangleParams.Create(ParamsPanel );
-end;
-
-procedure TPaintForm.TElipseClick(Sender: TObject);
-begin
-  FigureNow:= True;
-  ToolNow:= False;
-
-  CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
-  ParamsPanel.DestroyComponents;
-  TElipseParams.Create(ParamsPanel );
-end;
-
-procedure TPaintForm.TRoundRectClick(Sender: TObject);
-begin
-  FigureNow:= True;
-
-  CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
-  ToolNow:= False;
-
-  ParamsPanel.DestroyComponents;
-  TRoundRectParams.Create(ParamsPanel );
-end;
-
-procedure TPaintForm.TPolyLineClick(Sender: TObject);
-begin
-  FigureNow:= True;
-  ToolNow:= False;
-
-  CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
-  ParamsPanel.DestroyComponents;
-  TPolyLineParams.Create(ParamsPanel );
-end;
-
-procedure TPaintForm.TLineClick(Sender: TObject);
-begin
-  FigureNow:= True;
-  ToolNow:= False;
-
-  CurrentFigure:= FigureList[(Sender as TSpeedButton).Tag];
-
-  ParamsPanel.DestroyComponents;
-  TLineParams.Create(ParamsPanel );
-end;
-
-procedure TPaintForm.THandClick(Sender: TObject);
-begin
-  FigureNow:= False;
-  ToolNow:= True;
-
-  CurrentTool:= ToolsList[(Sender as TSpeedButton).Tag-Length(FigureList)];
-  ParamsPanel.DestroyComponents;
-
-end;
-
-procedure TPaintForm.TMagnifierClick(Sender: TObject);
-begin
-  FigureNow:= False;
-  ToolNow:= True;
-  CurrentTool:= ToolsList[(Sender as TSpeedButton).Tag-Length(FigureList)];
-  ParamsPanel.DestroyComponents;
- end;
 
 
 procedure TPaintForm.DrawPlaceMouseDown(Sender: TObject; Button: TMouseButton;
@@ -249,59 +122,32 @@ procedure TPaintForm.DrawPlaceMouseDown(Sender: TObject; Button: TMouseButton;
 begin
   if Button = mbLeft then
   begin
-    If FigureNow then
-    begin
       IsDrawing:= True;
-      SetLength(CanvasFigures, Length(CanvasFigures) + 1);
-      CanvasFigures[High(CanvasFigures)]:= CurrentFigure.Create(WorldToScreenX(x), WorldToScreenY(y), LineColor, FillColor, LineWidth, FillStyles[CurrentFillStyle].BrushStyle, RadiusW, RadiusW);
+      CurrentTool.CreateFigure(Point(X,Y));
     end;
-    If ToolNow then
-    begin
-      IsDrawing:= True;
-      SetLength(CanvasTools, Length(CanvasTools) + 1);
-      CanvasTools[High(CanvasTools)]:= CurrentTool.Create((x), (y));
-      LastOffset:= Offset1;
-    end;
-  end;
   DrawPlace.Invalidate;
 end;
 
-procedure TPaintForm.DrawPlaceClick(Sender: TObject);
-begin
 
-end;
 
 procedure TPaintForm.DrawPlaceMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin
-  If FigureNow then
   if IsDrawing then
   begin
-    CanvasFigures[High(CanvasFigures)].MouseMove(x, y);
+    currentTool.MouseMove(X, Y, LastOffset);
     DrawPlace.Invalidate;
   end;
-  If ToolNow then
-  If IsDrawing then
-  begin
-    CanvasTools[High(CanvasTools)].MouseMove(x, y, LastOffset);
-    Offset1:= Offsetout();
-    DrawPlace.Invalidate;
-  end;
+
 end;
 
 procedure TPaintForm.DrawPlaceMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  if ToolNow then begin
-    CanvasTools[High(CanvasTools)].MouseUp(Button,X,Y);
-    DrawPlace.Invalidate;
+  CurrentTool.MouseUp(Button,X,Y);
+  IsDrawing:= False;
+  DrawPlace.Invalidate;
   end;
-  If Button = mbLeft then
-  begin
-    IsDrawing:= False;
-    DrawPlace.Invalidate;
-  end;
-end;
 
 procedure TPaintForm.DrawPlacePaint(Sender: TObject);
 var
