@@ -20,6 +20,8 @@ TFigures = Class
   WRadius, HRadius: Integer;
   constructor Create(APoint : WorldPoint);
   Procedure Draw(ACanvas: TCanvas); Virtual;
+  function FindTopLeft: WorldPoint;
+  function FindBottomRight: WorldPoint;
 end;
 
 TFigureClass = class of TFigures;
@@ -69,9 +71,6 @@ Constructor TFigures.Create(Apoint: WorldPoint) ;
 begin
   SetLength(Points, Length(Points) + 1);
   Points[high(points)]:= Apoint;
-
-  {PPoints[0]:= WPoint((x / (scale * scale)  - (Offset.x * 2))  , (y / (scale * scale) - (Offset.y * 2)));
-  Points[1]:= Points[0];}
 end;
 
 procedure TFigures.Draw(ACanvas: TCanvas);
@@ -90,7 +89,6 @@ begin
   for i := low(Points) to High(Points) do
     ScreenPoints[i]:= WorldToScreen(Points[i]);
 end;
-
 
  {PolyLine}
 
@@ -145,6 +143,36 @@ begin
     ScreenPoints[High(ScreenPoints)].x,
     ScreenPoints[High(ScreenPoints)].y,
     HRadius, WRadius);
+end;
+
+  {Coners of canvas}
+
+function TFigures.FindTopLeft: WorldPoint;
+var
+  i: WorldPoint;
+begin
+  Result := Points[Low(Points)];
+  for i in Points do
+  begin
+    if (i.x < Result.x) then
+      Result.x := i.x;
+    if (i.y < Result.y) then
+      Result.y := i.y;
+  end;
+end;
+
+function TFigures.FindBottomRight: WorldPoint;
+var
+  i: WorldPoint;
+begin
+  Result := Points[Low(Points)];
+  for i in Points do
+  begin
+    if (i.x > Result.x) then
+      Result.x := i.x;
+    if (i.y > Result.y) then
+      Result.y := i.y;
+  end;
 end;
 
 end.
