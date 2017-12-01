@@ -187,7 +187,7 @@ procedure TTool.AddBrushParams(APanel: TPanel);
 var
   i: integer;
 begin
-  i := High(Params); SetLength(Params, Length(Params) + 3);
+  i := High(Params); SetLength(Params, Length(Params) + 1);
   Params[i + 2]:= TColorParams.Create(APanel, FillColorLabel, MFillColor);
   Params[i + 1]:= TBrushStyleParams.Create(APanel, FillStyleLabel, MFillStyle);
 end;
