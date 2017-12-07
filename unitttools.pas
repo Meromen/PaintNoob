@@ -5,7 +5,9 @@ unit UnitTTools;
 interface
 
 uses
-  Classes, SysUtils, Transformation, UnitTFigure, UnitParams, Graphics, Controls, math, ExtCtrls;
+  Classes, SysUtils, Transformation, UnitTFigure, UnitParams, Graphics, Controls,
+  ExtCtrls, StdCtrls, LCLIntf, LCLType, Buttons,
+  Math, FPCanvas, TypInfo, LCL;
 
 type
 TToolClass = Class of TTool;
@@ -80,9 +82,23 @@ TLineTool = class(TTwoPointTool)
 end;
 
  {TPolyLineTool}
- TPolyLineTool = class(TTool)
+TPolyLineTool = class(TTool)
   procedure MouseMove(X, Y: Integer; ALastOffset: TPoint); Override;
   procedure CreateParams(APanel: TPanel); override;
+end;
+
+ {TSelectTool}
+TSelectTool = class(TActionTool)
+  procedure MouseUp(Button: TMouseButton; X, Y: integer); override;
+  procedure PointSelectTool(Point: TPoint);
+  procedure RectSelectTool(Point: TPoint);
+end;
+
+ {TMoveTool}
+TMoveTool = class(TInvisibleActionTool)
+  Apoint: Tpoint;
+  procedure AddPoint(Point: TPoint); override;
+  procedure CreateFigure(Point: TPoint); override;
 end;
 
 procedure RegisterTool(ATool: TTool; AFigureClass: TFigureClass; BMPSorce: String);
@@ -272,6 +288,108 @@ begin
   AddPenParams(Panel);
 end;
 
+procedure TSelectTool.MouseUp (Button: TMouseButton; X, Y: integer);
+var
+  ToolRegion: HRGN;
+  i: integer;
+  //Prop: array of TProperty;
+  //Values: array of integer;
+begin
+  with CanvasFigures[high(CanvasFigures)] do
+    begin
+      Region := CreateRectRgn(
+      WorldToScreen(Points[0]).x,WorldToScreen(Points[0]).y,
+      WorldToScreen(Points[high(points)]).x,WorldToScreen(Points[high(points)]).y);
+    end;
+
+  //if (not CtrlPressed) then
+   // begin
+      for i :=0 to high(CanvasFigures)-1 do
+        begin
+          if (CombineRgn(ToolRegion,CanvasFigures[i].Region,CanvasFigures[high(CanvasFigures)].Region,RGN_AND)
+            <> NullRegion) then
+            CanvasFigures[i].Selected := false;
+        end;
+    //end;
+
+  with CanvasFigures[high(CanvasFigures)] do
+    begin
+      If not((Points[0].X=Points[high(points)].X) and (Points[0].Y=Points[high(points)].Y)) then
+        RectSelectTool(Point(X, Y))
+      else
+        PointSelectTool(Point(X, Y));
+     end;
+  SetLength(CanvasFigures, length(CanvasFigures) - 1);
+
+end;
+
+procedure TSelectTool.RectSelectTool(Point: TPoint);
+var
+  i:integer;
+  ToolRegioN: HRGN;
+begin
+    for i := 0 to high(CanvasFigures)-1 do
+    begin
+        DeleteObject(CanvasFigures[i].Region);
+        CanvasFigures[i].CreateRegion;
+        ToolRegioN := CreateRectRgn(1,1,2,2);
+        if (CombineRgn(ToolRegioN,CanvasFigures[i].Region,CanvasFigures[high(CanvasFigures)].Region,RGN_AND)
+          <> NULLREGION) then
+            begin
+              if CanvasFigures[i].Selected = false then
+                CanvasFigures[i].Selected := true
+              else
+                CanvasFigures[i].Selected := false;
+            end;
+        DeleteObject(ToolRegion);
+    end;
+end;
+
+procedure TSelectTool.PointSelectTool(Point: TPoint);
+var
+  i:integer;
+begin
+      for i := high(CanvasFigures)-1 downto low(CanvasFigures)  do
+      begin
+        with CanvasFigures[i] do
+        begin
+          DeleteObject(Region);
+          CreateRegion;
+          if PtInRegion(Region,Point.X,Point.Y)=true then
+            begin
+              if Selected = false then
+                Selected := true
+              else
+                Selected := false;
+            end;
+        end;
+      end;
+end;
+
+procedure TMoveTool.AddPoint(Point: TPoint);
+var
+  i, j: integer;
+  P: TPoint;
+begin
+  P.x:= Point.x - APoint.x;
+  P.y:= Point.y - APoint.y;
+  for i:=0 to High(CanvasFigures) do
+    if CanvasFigures[i].Selected then
+      for j:=0 to High(CanvasFigures[i].Points) do
+        begin
+        CanvasFigures[i].Points[j].X := CanvasFigures[i].Points[j].X + ScreenToWorld(P).X;
+        CanvasFigures[i].Points[j].Y := CanvasFigures[i].Points[j].Y + ScreenToWorld(P).Y;
+        end;
+  APoint:= Point;
+end;
+
+procedure TMoveTool.CreateFigure(Point: TPoint);
+begin
+  APoint := Point;
+  //Drawing := True;
+end;
+
+
 procedure RegisterTool(ATool: TTool; AFigureClass: TFigureClass; BMPSorce: String);
 begin
   SetLength(ToolsList, Length(ToolsList) + 1);
@@ -339,11 +457,12 @@ end;
 Initialization
 RegisterTool(TPenTool.Create, TPolyLine, 'TPen.ico');
 RegisterTool(TLineTool.Create, TLine, 'TLine.ico');
-//RegisterTool(TPolyLineTool.Create, TPolyLine, 'TPolyLine.ico');
 RegisterTool(TRectangleTool.Create, TRectangle, 'TRectangle.ico');
 RegisterTool(TRoundRectangleTool.Create, TRoundRect, 'TRoundRect.ico');
 RegisterTool(TEllipseTool.Create, TEllipse, 'TEllipse.ico');
 RegisterTool(THand.Create, TRectangle, 'THand.ico');
 RegisterTool(TMagnifier.Create, TRectangle, 'TMagnifier.ico');
+RegisterTool(TSelectTool.Create, TRectangle, 'TSelect.ico');
+RegisterTool(TMoveTool.Create, TRectangle, 'TMove.ico');
 end.
 
