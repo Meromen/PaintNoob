@@ -44,8 +44,8 @@ object PaintForm: TPaintForm
     end
     object ParamsPanel: TPanel
       Left = 1
-      Height = 305
-      Top = 360
+      Height = 313
+      Top = 352
       Width = 76
       Align = alBottom
       TabOrder = 1
@@ -73,16 +73,32 @@ object PaintForm: TPaintForm
   object MainMenu1: TMainMenu
     left = 240
     top = 224
-    object MenuItem1: TMenuItem
-      Caption = 'New Item1'
-      object MenuItem2: TMenuItem
-        Caption = 'New Item2'
-        OnClick = MenuItem2Click
+    object FileMenu: TMenuItem
+      Caption = 'File'
+      object SaveBut: TMenuItem
+        Caption = 'Save'
+        OnClick = SaveButClick
+      end
+      object SaveAsBut: TMenuItem
+        Caption = 'Save As'
+        OnClick = SaveAsButClick
+      end
+      object SaveAsButPic: TMenuItem
+        Caption = 'Save as picture'
+        OnClick = SaveAsButPicClick
+      end
+      object LoadBut: TMenuItem
+        Caption = 'Load'
+        OnClick = LoadButClick
       end
     end
   end
-  object SaveDialog1: TSaveDialog
+  object SaveDialog: TSaveDialog
     left = 200
     top = 224
+  end
+  object OpenDialog: TOpenDialog
+    left = 237
+    top = 123
   end
 end
