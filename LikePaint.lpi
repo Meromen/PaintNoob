@@ -33,7 +33,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="5">
+    <Units Count="7">
       <Unit0>
         <Filename Value="LikePaint.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -61,6 +61,16 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Transformation"/>
       </Unit4>
+      <Unit5>
+        <Filename Value="unitparams.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UnitParams"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="unitconstants.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UnitConstants"/>
+      </Unit6>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
