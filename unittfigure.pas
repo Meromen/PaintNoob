@@ -5,9 +5,9 @@ unit UnitTFigure;
 interface
 
 uses
-  Classes, SysUtils, Graphics, Transformation, Controls, UnitParams,
+  Classes, SysUtils, Graphics, Transformation, Controls,
   Grids, LCLIntf,LCLType,
-   Buttons, GraphMath, Math, Spin, FPCanvas, TypInfo, LCL, Windows;
+   Buttons, GraphMath, Math, Spin, FPCanvas, TypInfo, LCL, Windows, UnitConstants;
 
 type
 
@@ -15,7 +15,7 @@ type
 TFigures = Class
   Points: ArrayWorldPoint;
   ScreenPoints: Array of TPoint;
-  FillColor, LineColor: TColor;
+  FillColor, PenColor: TColor;
   LineWidth: Integer;
   PenStyle: TPenStyle;
   FillStyle: TBrushStyle;
@@ -28,6 +28,9 @@ TFigures = Class
   procedure CreateRegion; virtual; abstract;
   function FindBottomRight: WorldPoint;
   procedure DrawOutline(Point1,Point2: WorldPoint; Canvas: TCanvas);
+  function Save:TStringArray; virtual;
+  procedure Load; virtual;
+  function GetParametersList: TStringArray; virtual;
 end;
 
 TFigureClass = class of TFigures;
@@ -38,6 +41,8 @@ TPolyline = Class(TFigures)
 Public
  procedure Draw(ACanvas: TCanvas); override;
  procedure CreateRegion; override;
+ function Save: TStringArray; override;
+ procedure Load; override;
 end;
 
   {TLine}
@@ -45,6 +50,8 @@ TLine = Class(TFigures)
 Public
  procedure Draw(ACanvas: TCanvas); override;
  procedure CreateRegion; override;
+ function Save: TStringArray; override;
+ procedure Load; override;
 end;
 
   {TRectangle}
@@ -52,6 +59,8 @@ TRectangle = Class(TFigures)
 Public
  procedure Draw(ACanvas: TCanvas); override;
  procedure CreateRegion; override;
+ function Save: TStringArray; override;
+ procedure Load; override;
 end;
 
   {TEllipse}
@@ -59,6 +68,8 @@ TEllipse = Class(TFigures)
 Public
  procedure Draw(ACanvas: TCanvas); override;
  procedure CreateRegion; override;
+ function Save: TStringArray; override;
+ procedure Load; override;
 end;
 
   {TRoundRect}
@@ -66,15 +77,25 @@ TRoundRect = Class(TFigures)
 Public
  procedure Draw(ACanvas: TCanvas); override;
  procedure CreateRegion; override;
+ function Save: TStringArray; override;
+ procedure Load; override;
+ function GetParametersList: TStringArray; override;
 end;
+
+
 
 TFfigureClass = class of TFigures;
 
  procedure LineRegion(p1,p2:TPoint;var tempPoints: array of TPoint;Width:integer);
+ function CasePenStyle(Index: integer):TPenStyle;
+ function CaseBrushStyle(Index: integer):TBrushStyle;
+ function CasePenStyleIndex(Style: TPenStyle): integer;
+ function CaseBrushStyleIndex(BrushStyle: TBrushStyle): integer;
 
 var
   FigureList: TFigureList;
   CanvasFigures: Array of TFigures;
+
 
 
 implementation
@@ -92,7 +113,7 @@ begin
   with ACanvas do
   begin
     Pen.Width := LineWidth;
-    Pen.Color := LineColor;
+    Pen.Color := PenColor;
     Pen.Style := PenStyle;
     Brush.Color := FillColor;
     Brush.Style := FillStyle;
@@ -100,6 +121,16 @@ begin
   SetLength(ScreenPoints, Length(Points));
   for i := low(Points) to High(Points) do
     ScreenPoints[i]:= WorldToScreen(Points[i]);
+end;
+
+function TFigures.GetParametersList: TStringArray;
+begin
+  SetLength(Result, 5);
+  Result[4] := LineWidthLabel;
+  Result[3] := FillStyleLabel;
+  Result[2] := FillStyleLabel;
+  Result[1] := PenColorLabel;
+  Result[0] := FillColorLabel;
 end;
 
 procedure TFigures.DrawOutline(Point1,Point2: WorldPoint; Canvas: TCanvas);
@@ -150,6 +181,84 @@ begin
     end;
 end;
 
+function TFigures.Save:TStringArray;
+var
+  i: integer;
+begin
+  SetLength(Result, 2);
+  Result[0] := ClassName;
+  Result[1] := IntToStr(Length(Points)) + ' ';
+  for i:=0 to High(Points) do
+    begin
+    Result[1] += FloatToStr(Points[i].X) + ' ';
+    Result[1] += FloatToStr(Points[i].Y) + ' ';
+    end;
+end;
+
+procedure TFigures.Load;
+var
+  i, n: integer;
+begin
+  read(n);
+  SetLength(Points, n);
+  for i:=0 to n-1 do
+    begin
+      read(Points[i].X);
+      read(Points[i].Y);
+    end;
+  readln();
+end;
+
+
+function CasePenStyle(Index: integer): TPenStyle;
+begin
+  case Index of
+    0:Result := psSolid;
+    1:Result := psDash;
+    2:Result := psDot;
+    3:Result := psDashDot;
+    4:Result := psDashDotDot;
+  end;
+end;
+
+function CasePenStyleIndex(Style: TPenStyle): integer;
+begin
+    case Style of
+    psSolid:Result := 0;
+    psDash:Result := 1;
+    psDot:Result := 2;
+    psDashDot:Result := 3;
+    psDashDotDot:Result := 4;
+  end;
+end;
+
+function CaseBrushStyle(Index: integer): TBrushStyle;
+begin
+  case Index of
+    0:Result := bsSolid;
+    1:Result := bsBDiagonal;
+    2:Result := bsDiagCross;
+    3:Result := bsVertical;
+    4:Result := bsCross;
+    5:Result := bsFDiagonal;
+    6:Result := bsHorizontal;
+  end;
+end;
+
+function CaseBrushStyleIndex(BrushStyle: TBrushStyle): integer;
+begin
+  case BrushStyle of
+    bsSolid: Result := 0;
+    bsBDiagonal:Result := 1;
+    bsDiagCross:Result := 2;
+    bsVertical:Result := 3;
+    bsCross:Result := 4;
+    bsFDiagonal:Result := 5;
+    bsHorizontal:Result := 6;
+  end;
+end;
+
+
  {PolyLine}
 
 procedure TPolyline.Draw(ACanvas: TCanvas);
@@ -194,8 +303,28 @@ begin
   end;
 end;
 
+function TPolyLine.Save:TStringArray;
+begin
+  Result := Inherited;
+  SetLength(Result, Length(Result) + 3);
+  Result[High(Result)-2] := IntToStr(LineWidth);
+  Result[High(Result)-1] := ColorToString(PenColor);
+  Result[High(Result)] := IntToStr(CasePenStyleIndex(PenStyle));
+end;
 
-
+procedure TPolyLine.Load;
+var
+  a: integer;
+  s: string;
+begin
+  Inherited;
+  readln(a);
+  LineWidth := a;
+  readln(s);
+  PenColor := StringToColor(s);
+  readln(a);
+  PenStyle := CasePenStyle(a);
+end;
 
  {Line}
 
@@ -223,6 +352,29 @@ begin
   end;
 end;
 
+function TLine.Save:TStringArray;
+begin
+  Result := Inherited;
+  SetLength(Result, Length(Result) + 3);
+  Result[High(Result)-2] := IntToStr(LineWidth);
+  Result[High(Result)-1] := ColorToString(PenColor);
+  Result[High(Result)] := IntToStr(CasePenStyleIndex(PenStyle));
+end;
+
+procedure TLine.Load;
+var
+  a: integer;
+  s: string;
+begin
+  Inherited;
+  readln(a);
+  LineWidth := a;
+  readln(s);
+  PenColor := StringToColor(s);
+  readln(a);
+  PenStyle := CasePenStyle(a);
+end;
+
  {Rectangle}
 
 procedure TRectangle.CreateRegion;
@@ -248,7 +400,26 @@ begin
     DeleteObject(Region);
     DrawOutline(Points[0],Points[high(Points)],aCanvas);
   end;
+end;
 
+function TRectangle.Save:TStringArray;
+begin
+  Result := Inherited;
+  SetLength(Result, Length(Result) + 2);
+  Result[High(Result)-1] := ColorToString(FillColor);
+  Result[High(Result)] := IntToStr(CaseBrushStyleIndex(FillStyle));
+end;
+
+procedure TRectangle.Load;
+var
+  a: integer;
+  s: string;
+begin
+  Inherited;
+  readln(s);
+  FillColor := StringToColor(s);
+  readln(a);
+  FillStyle := CaseBrushStyle(a);
 end;
 
  {TEllipse}
@@ -275,7 +446,26 @@ begin
     DeleteObject(Region);
     DrawOutline(Points[0],Points[high(Points)],aCanvas);
   end;
+end;
 
+function TEllipse.Save:TStringArray;
+begin
+  Result := Inherited;
+  SetLength(Result, Length(Result) + 2);
+  Result[High(Result)-1] := ColorToString(FillColor);
+  Result[High(Result)] := IntToStr(CaseBrushStyleIndex(FillStyle));
+end;
+
+procedure TEllipse.Load;
+var
+  a: integer;
+  s: string;
+begin
+  Inherited;
+  readln(s);
+  FillColor := StringToColor(s);
+  readln(a);
+  FillStyle := CaseBrushStyle(a);
 end;
 
  {TRoundRect}
@@ -307,6 +497,31 @@ begin
   end;
 end;
 
+function TRoundRect.GetParametersList: TStringArray;
+begin
+  Result := inherited;
+  SetLength(Result, Length(Result) + 1);
+  Result[High(Result)] := Radius;
+end;
+
+function TRoundRect.Save:TStringArray;
+begin
+  Result := Inherited;
+  SetLength(Result, Length(Result) + 2);
+  Result[High(Result)] := IntToStr(WRadius);
+  Result[High(Result)] += ' ' + IntToStr(HRadius);
+end;
+
+procedure TRoundRect.Load;
+var
+  a: integer;
+begin
+  Inherited;
+  read(a);
+  WRadius := a;
+  readln(a);
+  HRadius := a;
+end;
   {Coners of canvas}
 
 function TFigures.FindTopLeft: WorldPoint;
