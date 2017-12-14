@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Transformation, UnitTFigure, UnitParams, Graphics, Controls,
   ExtCtrls, StdCtrls, LCLIntf, LCLType, Buttons,
-  Math, FPCanvas, TypInfo, LCL;
+  Math, FPCanvas, TypInfo, LCL, UnitConstants;
 
 type
 TToolClass = Class of TTool;
@@ -27,6 +27,7 @@ TTool = Class
   procedure CreateParams(APanel: TPanel); virtual;
   procedure ShowParameters;
   procedure HideParameters;
+  procedure UpdateParameters;
 end;
 
   {TwoPointTool}
@@ -63,26 +64,31 @@ end;
 
  {TRectangleTool}
 TRectangleTool = class(TTwoPointTool)
+  constructor Create;
   procedure CreateParams(APanel: TPanel); override;
 end;
 
  {TRoudRectangleTool}
 TRoundRectangleTool = class(TTwoPointTool)
+  constructor Create;
   procedure CreateParams(APanel: TPanel); override;
 end;
 
  {TEllipseTool}
 TEllipseTool = class(TTwoPointTool)
+  constructor Create;
   procedure CreateParams(APanel: TPanel); override;
 end;
 
  {TLineTool}
 TLineTool = class(TTwoPointTool)
+  constructor Create;
   procedure CreateParams(APanel: TPanel); override;
 end;
 
  {TPolyLineTool}
 TPolyLineTool = class(TTool)
+  constructor Create;
   procedure MouseMove(X, Y: Integer; ALastOffset: TPoint); Override;
   procedure CreateParams(APanel: TPanel); override;
 end;
@@ -102,14 +108,73 @@ TMoveTool = class(TInvisibleActionTool)
 end;
 
 procedure RegisterTool(ATool: TTool; AFigureClass: TFigureClass; BMPSorce: String);
+function GetParametersList: TStringArray;
+procedure RegisterParam(AName: String; AParamClass: TParamClass);
+procedure CreateParametersFromList(List: TStringArray; APanel: TPanel;
+  var Params: TParamsArray);
 
 
 
 var
+ParamsRegister: TParamRecordArray;
 ToolsList: array of TTool;
 
 
 implementation
+
+constructor TPolylineTool.Create;
+begin
+end;
+
+constructor TRectangleTool.Create;
+begin
+end;
+
+constructor TRoundRectangleTool.Create;
+begin
+end;
+
+constructor TEllipseTool.Create;
+begin
+end;
+
+constructor TLineTool.Create;
+begin
+end;
+
+function GetParametersList: TStringArray;
+var p: TParamRecord;
+begin
+  for p in ParamsRegister do begin
+    SetLength(Result, Length(Result) + 1);
+    Result[High(Result)] := p.Name;
+  end;
+end;
+
+procedure CreateParametersFromList(List: TStringArray; APanel: TPanel; var Params: TParamsArray);
+var
+  p: TParamRecord; s: String;
+begin
+  for s in List do
+    for p in ParamsRegister do
+      if (s = p.Name) then
+      begin
+        SetLength(Params, Length(Params) + 1);
+        Params[High(Params)] := p.ParamClass.Create(APanel, s);
+        break;
+      end;
+end;
+
+procedure RegisterParam(AName: String; AParamClass: TParamClass);
+begin
+  SetLength(ParamsRegister, Length(ParamsRegister) + 1);
+  with ParamsRegister[High(ParamsRegister)] do
+  begin
+    Name := AName;
+    ParamClass := AParamClass;
+  end;
+end;
+
 
 procedure TTool.MouseMove(X, Y: Integer; ALastOffset: Tpoint);
 begin
@@ -130,7 +195,7 @@ begin
   with CanvasFigures[High(CanvasFigures)] do
   begin
     LineWidth:= MLineWidth;
-    LineColor:= MLineColor;
+    PenColor:= MPenColor;
     FillColor:= MFillColor;
     FillStyle:= MFillStyle;
     PenStyle:= MLineStyle;
@@ -139,15 +204,15 @@ begin
 
   for p in Params do
     case p.ParamLabel.Caption of
-      PenStyleLabel: PenStyle:= (p as TPenStyleParams).Param;
-      LineWidthLabel: LineWidth:= (p as TSpinParams).Param;
-      LineColorLabel: LineColor:= (p as TColorParams).Param;
-      FillColorLabel: FillColor:= (p as TColorParams).Param;
-      FillStyleLabel: FillStyle:= (p as TBrushStyleParams).Param;
+      PenStyleLabel: PenStyle:= MLineStyle;
+      LineWidthLabel: LineWidth:= MLineWidth;
+      PenColorLabel: PenColor:= MPenColor;
+      FillColorLabel: FillColor:= MFillColor;
+      FillStyleLabel: FillStyle:= MFillStyle;
       Radius:
         begin
-        WRadius:= (p as TSpinParams).Param;
-        HRadius:= (p as TSpinParams).Param;
+        WRadius:= MRadiusW;
+        HRadius:= MRadiusH;
         end;
     end;
   end;
@@ -175,8 +240,13 @@ begin
 end;
 
 procedure TTool.ShowParameters;
+var
+  i: TParams;
 begin
   Panel.Visible:= True;
+
+  for i in Params do
+    i.SetParamToInit;
 end;
 
 procedure TTool.HideParameters;
@@ -184,6 +254,7 @@ var
   i: TParams;
 begin
   Panel.Visible:= False;
+
   for i in Params do
     i.SetParamToInit;
 end;
@@ -194,9 +265,9 @@ var
 begin
   i:= High(Params);
   SetLength(Params, Length(Params) + 2);
-  Params[i + 1]:= TPenStyleParams.Create(APanel, PenStyleLabel, MLineStyle);
-  Params[i + 3]:= TColorParams.Create(APanel, LineColorLabel, MLineColor);
-  Params[i + 2]:= TSpinParams.Create(APanel, LineWidthLabel, MLineWidth);
+  Params[i + 1]:= TPenStyleParams.Create(APanel, PenStyleLabel);
+  Params[i + 3]:= TColorParams.Create(APanel, PenColorLabel);
+  Params[i + 2]:= TSpinParams.Create(APanel, LineWidthLabel);
 end;
 
 procedure TTool.AddBrushParams(APanel: TPanel);
@@ -204,8 +275,8 @@ var
   i: integer;
 begin
   i := High(Params); SetLength(Params, Length(Params) + 1);
-  Params[i + 2]:= TColorParams.Create(APanel, FillColorLabel, MFillColor);
-  Params[i + 1]:= TBrushStyleParams.Create(APanel, FillStyleLabel, MFillStyle);
+  Params[i + 2]:= TColorParams.Create(APanel, FillColorLabel);
+  Params[i + 1]:= TBrushStyleParams.Create(APanel, FillStyleLabel);
 end;
 
 procedure TTwoPointTool.AddPoint(APoint: TPoint);
@@ -230,7 +301,55 @@ end;
 procedure TActionTool.CreateParams(APanel: TPanel);
 begin
   inherited;
+  CreateParametersFromList(GetParametersList, Panel, Params);
+  UpdateParameters;
 end;
+
+procedure TTool.UpdateParameters;
+var
+  ParamsList, FigureList: TStringArray;
+  figure: TFigures;
+  param: TParams;
+  contains: boolean;
+  sParam: String;
+  i, j, k: integer;
+begin
+  for param in Params do
+    param.ParamPanel.Visible := False;
+  k := 0;
+
+  ParamsList := GetParametersList;
+  for figure in CanvasFigures do
+    if figure.Selected then
+    begin
+      k := k + 1;
+      j := 0;
+      FigureList := figure.GetParametersList;
+      for i := Low(ParamsList) to High(ParamsList) do
+      begin
+        contains := False;
+        for sParam in FigureList do
+          if ParamsList[i] = sParam
+            then contains := True;
+        if contains then
+        begin
+          ParamsList[j] := ParamsList[i];
+          j := j + 1;
+        end;
+      end;
+      SetLength(ParamsList, j);
+    end;
+  if (k > 0) then
+    for param in Params do
+      for sParam in ParamsList do
+        if (sParam = param.ParamLabel.Caption) then
+        begin
+          param.ParamPanel.Visible := True;
+          break;
+        end;
+end;
+
+
 
 procedure TInvisibleActionTool.CreateFigure(APoint: TPoint);
 begin
@@ -260,7 +379,7 @@ begin
   AddBrushParams(Panel);
   i := High(Params);
   SetLength(Params, Length(Params) + 1);
-  Params[i+1] := TSpinParams.Create(Panel, Radius, MRadiusH);
+  Params[i+1] := TSpinParams.Create(Panel, Radius);
 end;
 
 procedure TEllipseTool.CreateParams(APanel: TPanel);
@@ -377,8 +496,8 @@ begin
     if CanvasFigures[i].Selected then
       for j:=0 to High(CanvasFigures[i].Points) do
         begin
-        CanvasFigures[i].Points[j].X := CanvasFigures[i].Points[j].X + ScreenToWorld(P).X;
-        CanvasFigures[i].Points[j].Y := CanvasFigures[i].Points[j].Y + ScreenToWorld(P).Y;
+        CanvasFigures[i].Points[j].X := CanvasFigures[i].Points[j].X + ScreenToWorld(P).X - Offset.x;
+        CanvasFigures[i].Points[j].Y := CanvasFigures[i].Points[j].Y + ScreenToWorld(P).Y - offset.y;
         end;
   APoint:= Point;
 end;
