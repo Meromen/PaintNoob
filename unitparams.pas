@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, StdCtrls, Graphics, ExtCtrls, Forms, Controls, Buttons,
-  Dialogs, Spin;
+  Dialogs, Spin, UnitTFigure, UnitConstants;
 
 type
 
@@ -16,21 +16,22 @@ type
     constructor Create(APanel: TPanel; ACaption: String);
     procedure ChangeParameter(Sender: TObject); virtual; abstract;
     procedure SetParamToInit; virtual; abstract;
+    procedure ParamsInvalidate;
   end;
 
 
   TColorParams = class(TParams)
-    Param, InitValue: TColor;
+
     ParamControl: TColorButton;
-    constructor Create(APanel: TPanel; ACaption: String; Init: TColor);
+    constructor Create(APanel: TPanel; ACaption: String);
     procedure ChangeParameter(Sender: TObject); override;
     procedure SetParamToInit; override;
   end;
 
   TSpinParams = class(TParams)
-    Param, InitValue: Integer;
+
     ParamControl: TSpinEdit;
-    constructor Create(APanel: TPanel; ACaption: String; Init: Integer);
+    constructor Create(APanel: TPanel; ACaption: String);
     procedure ChangeParameter(Sender: TObject); override;
     procedure SetParamToInit; override;
   end;
@@ -41,20 +42,28 @@ type
   end;
 
   TPenStyleParams = class(TComboBoxParams)
-    Param, InitValue: TPenStyle;
-    constructor Create(APanel: TPanel; ACaption: String; Init: TPenStyle);
+
+    constructor Create(APanel: TPanel; ACaption: String);
     procedure ChangeParameter(Sender: TObject); override;
     procedure SetParamToInit; override;
   end;
 
   TBrushStyleParams = class(TComboBoxParams)
-    Param, InitValue: TBrushStyle;
-    constructor Create(APanel: TPanel; ACaption: String; Init: TBrushStyle);
+
+    constructor Create(APanel: TPanel; ACaption: String);
     procedure ChangeParameter(Sender: TObject); override;
     procedure SetParamToInit; override;
   end;
 
+
+  TParamClass = class of TParams;
   TParamsArray = Array of TParams;
+  TParamRecord = record
+    Name: String;
+    ParamClass: TParamClass;
+  end;
+
+  TParamRecordArray = array of TParamRecord;
 
   TBrushStyleRecord = record
     Name: String;
@@ -66,14 +75,8 @@ type
     PenStyle: TPenStyle;
   end;
 
-   const
-     LineWidthLabel = 'Pen Width';
-     PenStyleLabel  = 'Pen Style';
-     LineColorLabel = 'Pen Color';
-     FillColorLabel = 'Fill Color';
-     FillStyleLabel = 'Fill Style';
-     Radius = 'Radius';
 
+   const
 
    BRUSH_STYLES: array[0..7] of TBrushStyleRecord = (
     (Name: 'Solid'; BrushStyle: bsSolid),
@@ -96,13 +99,18 @@ type
 
 
    var
-    MLineColor, MFillColor: TColor;
+    MPenColor, MFillColor: TColor;
     MLineWidth, MRadiusW, MRadiusH : Integer;
     MFillStyle: TBrushStyle;
     MLineStyle: TPenStyle;
 
 
 implementation
+
+procedure TParams.ParamsInvalidate;
+begin
+  ParamPanel.Parent.Invalidate;
+end;
 
 constructor TParams.Create(APanel: TPanel; ACaption: String);
 begin
@@ -131,7 +139,7 @@ begin
   end;
 end;
 
-constructor TColorParams.Create (APanel: TPanel; ACaption: String; Init: TColor);
+constructor TColorParams.Create (APanel: TPanel; ACaption: String);
 Begin
   inherited Create(APanel, ACaption);
   ParamControl := TColorButton.Create(ParamPanel);
@@ -146,24 +154,41 @@ Begin
     Width := Parent.Width;
     OnColorChanged := @ChangeParameter;
   end;
-  InitValue := Init;
-  SetParamToInit;
 end;
 
 procedure TColorParams.ChangeParameter(Sender: TObject);
+var
+  i: TFigures;
+  Param: TColor;
 begin
   Param := ParamControl.ButtonColor;
+  case ParamLabel.Caption of
+    PenColorLabel: MPenColor := Param;
+    FillColorLabel: MFillColor := Param;
+  end;
   ParamControl.Color := Param;
+  for i in CanvasFigures do
+    if i.Selected then
+      case ParamLabel.Caption of
+        PenColorLabel: i.PenColor := Param;
+        FillColorLabel: i.FillColor := Param;
+      end;
+  ParamsInvalidate;
 end;
 
 procedure TColorParams.SetParamToInit;
+var
+  InitValue: TColor;
 begin
-  Param := InitValue;
+  case ParamLabel.Caption of
+    PenColorLabel: InitValue := MPenColor;
+    FillColorLabel: InitValue := MFillColor;
+  end;
   ParamControl.Color := InitValue;
   ParamControl.ButtonColor := InitValue;
 end;
 
-constructor TSpinParams.Create(APanel: TPanel; ACaption: String; Init: Integer);
+constructor TSpinParams.Create(APanel: TPanel; ACaption: String);
 begin
   inherited Create(APanel, ACaption);
   ParamControl := TSpinEdit.Create(ParamPanel);
@@ -179,11 +204,12 @@ begin
     MaxValue := 200;
     OnEditingDone := @ChangeParameter;
   end;
-  InitValue := Init;
-  SetParamToInit;
 end;
 
 procedure TSpinParams.ChangeParameter(Sender: TObject);
+var
+  i: TFigures;
+  Param: Integer;
 begin
   with ParamControl do
   begin
@@ -195,13 +221,31 @@ begin
     except on EConvertError do
       Caption := IntToStr(MinValue);
     end;
-    Param := ParamControl.Value;
   end;
+  Param := ParamControl.Value;
+  case ParamLabel.Caption of
+    LineWidthLabel: MLineWidth := Param;
+    Radius: MRadiusH := Param;
+  end;
+  for i in CanvasFigures do
+    if i.Selected then
+    begin
+      case ParamLabel.Caption of
+        LineWidthLabel: i.LineWidth := Param;
+        Radius: i.HRadius := Param;
+      end;
+    end;
+  ParamsInvalidate;
 end;
 
 procedure TSpinParams.SetParamToInit;
+  var
+  InitValue: Integer;
 begin
-  Param := InitValue;
+  case ParamLabel.Caption of
+    LineWidthLabel: InitValue := MLineWidth;
+    Radius: InitValue := MRadiusH;
+  end;
   ParamControl.Value := InitValue;
   ParamControl.Caption := IntToStr(InitValue);
 end;
@@ -223,7 +267,7 @@ begin
   end;
 end;
 
-constructor TBrushStyleParams.Create(APanel: TPanel; ACaption: String; Init: TBrushStyle);
+constructor TBrushStyleParams.Create(APanel: TPanel; ACaption: String);
 var
  i: TBrushStyleRecord;
 begin
@@ -232,48 +276,54 @@ begin
   begin
     for i in BRUSH_STYLES do
       Items.Add(i.Name);
-    InitValue := Init;
-    SetParamToInit;
   end;
 end;
 
 procedure TBrushStyleParams.ChangeParameter(Sender: TObject);
+var
+  i: TFigures;
 begin
-  Param := BRUSH_STYLES[ParamControl.ItemIndex].BrushStyle;
+  MFillStyle := BRUSH_STYLES[ParamControl.ItemIndex].BrushStyle;
+  for i in CanvasFigures do
+    if i.Selected then i.FillStyle := MFillStyle;
+  ParamsInvalidate;
 end;
 
 procedure TBrushStyleParams.SetParamToInit;
-var i: integer;
+var
+  i: integer;
 begin
   for i := Low(BRUSH_STYLES) to High(BRUSH_STYLES) do
-    if BRUSH_STYLES[i].BrushStyle = InitValue then
+    if BRUSH_STYLES[i].BrushStyle = MFillStyle then
       ParamControl.ItemIndex := i;
-  Param := InitValue;
 end;
 
 constructor TPenStyleParams.Create(APanel: TPanel;
-  ACaption: String; Init: TPenStyle);
+  ACaption: String);
 var i: TPenStyleRecord;
 begin
   inherited Create(APanel, ACaption);
   for i in PEN_STYLES do
     ParamControl.Items.Add(i.Name);
-  InitValue := Init;
-  SetParamToInit;
 end;
 
 procedure TPenStyleParams.ChangeParameter(Sender: TObject);
+var
+  i: TFigures;
 begin
-  Param := PEN_STYLES[ParamControl.ItemIndex].PenStyle;
+  MLineStyle := PEN_STYLES[ParamControl.ItemIndex].PenStyle;
+  for i in CanvasFigures do
+    if i.Selected then i.PenStyle := MLineStyle;
+ // ParamsInvalidate;
 end;
 
 procedure TPenStyleParams.SetParamToInit;
-var i: integer;
+var
+  i: integer;
 begin
   for i := Low(PEN_STYLES) to High(PEN_STYLES) do
-    if PEN_STYLES[i].PenStyle = InitValue then
+    if PEN_STYLES[i].PenStyle = MLineStyle then
       ParamControl.ItemIndex := i;
-  Param := InitValue;
 end;
 
 end.
