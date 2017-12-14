@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
   ExtCtrls, Spin, ActnList, Buttons, StdCtrls, ComCtrls, UnitTFigure, UnitParams,
-  UnitTTools, Transformation ;
+  UnitTTools, Transformation, LCLType, LCLIntf, UnitConstants;
 
 Type
     TPointList = array of TPoint;
@@ -22,10 +22,14 @@ Type
   TPaintForm = class(TForm)
     DrawPlace: TPaintBox;
     MainMenu1: TMainMenu;
-    MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
+    FileMenu: TMenuItem;
+    SaveAsButPic: TMenuItem;
+    OpenDialog: TOpenDialog;
+    SaveAsBut: TMenuItem;
+    SaveBut: TMenuItem;
+    LoadBut: TMenuItem;
     ParamsPanel: TPanel;
-    SaveDialog1: TSaveDialog;
+    SaveDialog: TSaveDialog;
     SpinEdit1: TSpinEdit;
     ToolsPanel: TPanel;
     HScrollBar: TScrollBar;
@@ -38,10 +42,15 @@ Type
     procedure DrawPlaceMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure DrawPlacePaint(Sender: TObject);
-    procedure MenuItem2Click(Sender: TObject);
+    procedure LoadButClick(Sender: TObject);
+    procedure SaveAsButClick(Sender: TObject);
+    procedure SaveAsButPicClick(Sender: TObject);
+    procedure SaveButClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ToolsButClick(Sender: TObject);
+    procedure SaveFile(APictureName: string);
+    procedure WriteTitle;
 
 
   private
@@ -52,13 +61,16 @@ Type
 
 var
   PaintForm: TPaintForm;
-  CurrentFillColor, CurrentLineColor: TColor;
+  CurrentFillColor, CurrentPenColor: TColor;
   CurrentLineWidth, CurrentFillStyle, CurrentRadius: Integer;
   CanvasTools: Array of TTool;
   CurrentTool: TTool;
   Offset1: Tpoint;
   LastOffset: TPoint;
   IsDrawing: Boolean;
+  PictureName:String = 'New Picture';
+  PreviousPicture: String;
+  PictureChanged: boolean = false;
 
 
 
@@ -82,8 +94,9 @@ begin
   MFillStyle:= bsSolid;
   MLineWidth:= 1;
   MFillColor:= clWhite;
-  MLineColor:= clBlack;
+  MPenColor:= clBlack;
   MRadiusW:= 10;
+  MRadiusH:= 10;
   SpinEdit1.Value:= 100;
   IsDrawing:= false;
   PBHeight:= DrawPlace.Height;
@@ -167,22 +180,124 @@ begin
     i.Draw(DrawPlace.Canvas);
 end;
 
-procedure TPaintForm.MenuItem2Click(Sender: TObject);
+procedure TPaintForm.LoadButClick(Sender: TObject);
+var
+  i,n,j: integer;
+  s: string;
+begin
+  OpenDialog.Filter := 'Picture|*.pnt|';
+  OpenDialog.Title := 'Load';
+  OpenDialog.Execute;
+
+  PictureName := OpenDialog.FileName;
+
+  AssignFile(input,PictureName);
+  Reset(input);
+  readln(s);
+  if s = '&*_MyPaint_*&' then
+    begin
+      readln(n);
+      SetLength(CanvasFigures, n);
+      for i:=0 to n-1 do
+        begin
+          readln(s);
+          for j:=0 to High(ToolsList) do
+            if ToolsList[j].FigureClass <> Nil then
+              if ToolsList[j].FigureClass.ClassName = s then
+                begin
+                  CanvasFigures[i] := ToolsList[j].FigureClass.Create(WPoint(0,0));
+                  CanvasFigures[i].Load;
+                  Break;
+                end;
+        end;
+    end;
+
+  CloseFile(input);
+  Invalidate;
+
+end;
+
+procedure TPaintForm.SaveAsButClick(Sender: TObject);
+begin
+ SaveDialog.InitialDir := GetCurrentDir;
+    SaveDialog.Title := 'Save As';
+    SaveDialog.DefaultExt := 'pnt';
+    SaveDialog.Filter := 'Picture|*.pnt|';
+    SaveDialog.FileName := PictureName;
+    if SaveDialog.Execute then
+      begin
+      if FileExists(SaveDialog.FileName) then
+        begin
+          if (Application.MessageBox('Overwrite file?',
+            '', MB_ICONQUESTION + MB_YESNO) = IDYES) then
+            begin
+              SaveFile(SaveDialog.FileName);
+          end else
+            begin
+              SaveAsBut.Click;
+              Exit;
+            end;
+        end else
+          begin
+            SaveFile(SaveDialog.FileName);
+          end;
+    end;
+end;
+
+procedure TPaintForm.SaveAsButPicClick(Sender: TObject);
 var bmp: TBitmap;
 begin
-  SaveDialog1.Title:='';
-  if SaveDialog1.Execute then
+  SaveDialog.Title:='Save as picture';
+  SaveDialog.DefaultExt := 'Bmp';
+  if SaveDialog.Execute then
     begin
     bmp := TBitmap.Create;
     try
       bmp.Width := DrawPlace.Width;
       bmp.Height := DrawPlace.Height;
       bmp.Canvas.CopyRect(Rect(0, 0, bmp.Width, bmp.Height), DrawPlace.Canvas, rect (0,0,DrawPlace.Width, DrawPlace.Height));
-      bmp.SaveToFile(SaveDialog1.Filename);
+      bmp.SaveToFile(SaveDialog.Filename);
       finally
         bmp.Free;
       end;
     end;
+end;
+
+
+procedure TPaintForm.SaveButClick(Sender: TObject);
+begin
+  if (PreviousPicture = PictureName) then
+    SaveFile(PictureName)
+  else
+    SaveAsButClick(TObject.Create);
+end;
+
+procedure TPaintForm.SaveFile(APictureName: string);
+var
+  i,j: integer;
+begin
+  AssignFile(output,APictureName);
+  rewrite(output);
+  writeln('&*_MyPaint_*&');
+  writeln(length(CanvasFigures));
+  for i:=0 to high(CanvasFigures) do
+    begin
+      for j:=0 to high((CanvasFigures[i]).Save) do
+        writeln((CanvasFigures[i]).Save[j]);
+    end;
+  CloseFile(output);
+  PictureName := APictureName;
+  PreviousPicture := APictureName;
+  PictureChanged:=false;
+  WriteTitle;
+end;
+
+procedure TPaintForm.WriteTitle;
+begin
+  PaintForm.Caption := PictureName;
+  if PictureChanged then
+    PaintForm.Caption := PaintForm.Caption + '*';
+  PaintForm.Caption := PaintForm.Caption + ' -- My Paint';
 end;
 
 procedure TPaintForm.SpinEdit1Change(Sender: TObject);
