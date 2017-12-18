@@ -275,6 +275,7 @@ end;
 procedure TPaintForm.SaveFile(APictureName: string);
 var
   i,j: integer;
+  s: TStringArray;
 begin
   AssignFile(output,APictureName);
   rewrite(output);
@@ -282,8 +283,9 @@ begin
   writeln(length(CanvasFigures));
   for i:=0 to high(CanvasFigures) do
     begin
-      for j:=0 to high((CanvasFigures[i]).Save) do
-        writeln((CanvasFigures[i]).Save[j]);
+      s:= CanvasFigures[i].Save;
+      for j:=0 to high(s) do
+        writeln(s[j]);
     end;
   CloseFile(output);
   PictureName := APictureName;

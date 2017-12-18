@@ -405,9 +405,12 @@ end;
 function TRectangle.Save:TStringArray;
 begin
   Result := Inherited;
-  SetLength(Result, Length(Result) + 2);
-  Result[High(Result)-1] := ColorToString(FillColor);
-  Result[High(Result)] := IntToStr(CaseBrushStyleIndex(FillStyle));
+  SetLength(Result, Length(Result) + 5);
+  Result[High(Result)-4] := ColorToString(PenColor);
+  Result[High(Result)-3] := ColorToString(FillColor);
+  Result[High(Result)-2] := IntToStr(LineWidth);
+  Result[High(Result)-1] := IntToStr(CaseBrushStyleIndex(FillStyle));
+  Result[High(Result)] := IntToStr(CasePenStyleIndex(PenStyle));
 end;
 
 procedure TRectangle.Load;
@@ -417,9 +420,15 @@ var
 begin
   Inherited;
   readln(s);
-  FillColor := StringToColor(s);
+  PenColor:= StringToColor(s);
+  readln(s);
+  FillColor:= StringToColor(s);
   readln(a);
-  FillStyle := CaseBrushStyle(a);
+  LineWidth:= a;
+  readln(a);
+  FillStyle:= CaseBrushStyle(a);
+  readln(a);
+  PenStyle:= CasePenStyle(a);
 end;
 
  {TEllipse}
@@ -451,9 +460,12 @@ end;
 function TEllipse.Save:TStringArray;
 begin
   Result := Inherited;
-  SetLength(Result, Length(Result) + 2);
-  Result[High(Result)-1] := ColorToString(FillColor);
-  Result[High(Result)] := IntToStr(CaseBrushStyleIndex(FillStyle));
+  SetLength(Result, Length(Result) + 5);
+  Result[High(Result)-4] := ColorToString(PenColor);
+  Result[High(Result)-3] := ColorToString(FillColor);
+  Result[High(Result)-2] := IntToStr(LineWidth);
+  Result[High(Result)-1] := IntToStr(CaseBrushStyleIndex(FillStyle));
+  Result[High(Result)] := IntToStr(CasePenStyleIndex(PenStyle));
 end;
 
 procedure TEllipse.Load;
@@ -463,9 +475,15 @@ var
 begin
   Inherited;
   readln(s);
-  FillColor := StringToColor(s);
+  PenColor:= StringToColor(s);
+  readln(s);
+  FillColor:= StringToColor(s);
   readln(a);
-  FillStyle := CaseBrushStyle(a);
+  LineWidth:= a;
+  readln(a);
+  FillStyle:= CaseBrushStyle(a);
+  readln(a);
+  PenStyle:= CasePenStyle(a);
 end;
 
  {TRoundRect}
@@ -507,7 +525,12 @@ end;
 function TRoundRect.Save:TStringArray;
 begin
   Result := Inherited;
-  SetLength(Result, Length(Result) + 2);
+  SetLength(Result, Length(Result) + 6);
+  Result[High(Result)-5] := ColorToString(PenColor);
+  Result[High(Result)-4] := ColorToString(FillColor);
+  Result[High(Result)-3] := IntToStr(LineWidth);
+  Result[High(Result)-2] := IntToStr(CaseBrushStyleIndex(FillStyle));
+  Result[High(Result)-1] := IntToStr(CasePenStyleIndex(PenStyle));
   Result[High(Result)] := IntToStr(WRadius);
   Result[High(Result)] += ' ' + IntToStr(HRadius);
 end;
@@ -515,8 +538,19 @@ end;
 procedure TRoundRect.Load;
 var
   a: integer;
+  s: string;
 begin
   Inherited;
+  readln(s);
+  PenColor:= StringToColor(s);
+  readln(s);
+  FillColor:= StringToColor(s);
+  readln(a);
+  LineWidth:= a;
+  readln(a);
+  FillStyle:= CaseBrushStyle(a);
+  readln(a);
+  PenStyle:= CasePenStyle(a);
   read(a);
   WRadius := a;
   readln(a);
