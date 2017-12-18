@@ -23,6 +23,9 @@ Type
     DrawPlace: TPaintBox;
     MainMenu1: TMainMenu;
     FileMenu: TMenuItem;
+    EditBut: TMenuItem;
+    FigureDownBut: TMenuItem;
+    FigureUpBut: TMenuItem;
     SaveAsButPic: TMenuItem;
     OpenDialog: TOpenDialog;
     SaveAsBut: TMenuItem;
@@ -42,7 +45,11 @@ Type
     procedure DrawPlaceMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure DrawPlacePaint(Sender: TObject);
+    procedure FigureDownButClick(Sender: TObject);
+    procedure FigureUpButClick(Sender: TObject);
     procedure LoadButClick(Sender: TObject);
+    procedure EditButClick(Sender: TObject);
+    procedure MenuItem2Click(Sender: TObject);
     procedure SaveAsButClick(Sender: TObject);
     procedure SaveAsButPicClick(Sender: TObject);
     procedure SaveButClick(Sender: TObject);
@@ -180,6 +187,44 @@ begin
     i.Draw(DrawPlace.Canvas);
 end;
 
+procedure TPaintForm.FigureDownButClick(Sender: TObject);
+var
+ t: TFigures;
+ i: integer;
+begin
+ if currentTool is TSelectTool then
+     begin
+       for i:= 0 to High(CanvasFigures)  do
+         if CanvasFigures[i].Selected then
+           if i <>  0  then
+             begin
+               t:= CanvasFigures[i];
+               CanvasFigures[i]:= CanvasFigures[i - 1];
+               CanvasFigures[i - 1]:= t;
+             end;
+     end;
+   DrawPlace.Invalidate;
+end;
+
+procedure TPaintForm.FigureUpButClick(Sender: TObject);
+ var
+ t: TFigures;
+ i: integer;
+ begin
+  if currentTool is TSelectTool then
+     begin
+       for i:= 0 to High(CanvasFigures)  do
+         if CanvasFigures[i].Selected then
+           if i <>  High(CanvasFigures)  then
+              begin
+                t:= CanvasFigures[i];
+                CanvasFigures[i]:= CanvasFigures[i + 1];
+                CanvasFigures[i + 1]:= t;
+              end;
+     end;
+   DrawPlace.Invalidate;
+end;
+
 procedure TPaintForm.LoadButClick(Sender: TObject);
 var
   i,n,j: integer;
@@ -216,6 +261,18 @@ begin
   Invalidate;
 
 end;
+
+procedure TPaintForm.EditButClick(Sender: TObject);
+begin
+
+end;
+
+procedure TPaintForm.MenuItem2Click(Sender: TObject);
+begin
+
+end;
+
+
 
 procedure TPaintForm.SaveAsButClick(Sender: TObject);
 begin

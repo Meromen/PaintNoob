@@ -92,6 +92,20 @@ object PaintForm: TPaintForm
         OnClick = LoadButClick
       end
     end
+    object EditBut: TMenuItem
+      Caption = 'Edit'
+      OnClick = EditButClick
+      object FigureUpBut: TMenuItem
+        Caption = 'FigureUp'
+        ShortCut = 33
+        OnClick = FigureUpButClick
+      end
+      object FigureDownBut: TMenuItem
+        Caption = 'FigureDown'
+        ShortCut = 34
+        OnClick = FigureDownButClick
+      end
+    end
   end
   object SaveDialog: TSaveDialog
     left = 200
