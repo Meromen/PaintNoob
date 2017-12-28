@@ -183,7 +183,7 @@ end;
 
 procedure TTool.MouseUp(Button: TMouseButton; X,Y:integer);
 begin
-
+  //SaveInBuffer;
 end;
 
 procedure TTool.CreateFigure(APoint: TPoint);
@@ -553,6 +553,7 @@ begin
         SetLength(CanvasFigures, Length(CanvasFigures) - 1);
        end;
   end;
+  SaveInBuffer;
 end;
 
 

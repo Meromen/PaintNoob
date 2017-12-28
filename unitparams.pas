@@ -173,6 +173,7 @@ begin
         PenColorLabel: i.PenColor := Param;
         FillColorLabel: i.FillColor := Param;
       end;
+  //SaveInBuffer;
   ParamsInvalidate;
 end;
 
@@ -186,6 +187,7 @@ begin
   end;
   ParamControl.Color := InitValue;
   ParamControl.ButtonColor := InitValue;
+  //SaveInBuffer;
 end;
 
 constructor TSpinParams.Create(APanel: TPanel; ACaption: String);
@@ -235,6 +237,7 @@ begin
         Radius: i.HRadius := Param;
       end;
     end;
+  //SaveInBuffer;
   ParamsInvalidate;
 end;
 
@@ -248,6 +251,7 @@ begin
   end;
   ParamControl.Value := InitValue;
   ParamControl.Caption := IntToStr(InitValue);
+ // SaveInBuffer;
 end;
 
 constructor TComboBoxParams.Create(APanel: TPanel; ACaption: String);
@@ -286,6 +290,7 @@ begin
   MFillStyle := BRUSH_STYLES[ParamControl.ItemIndex].BrushStyle;
   for i in CanvasFigures do
     if i.Selected then i.FillStyle := MFillStyle;
+  //SaveInBuffer;
   ParamsInvalidate;
 end;
 
@@ -314,7 +319,7 @@ begin
   MLineStyle := PEN_STYLES[ParamControl.ItemIndex].PenStyle;
   for i in CanvasFigures do
     if i.Selected then i.PenStyle := MLineStyle;
- // ParamsInvalidate;
+  //SaveInBuffer;
 end;
 
 procedure TPenStyleParams.SetParamToInit;

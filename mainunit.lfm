@@ -105,6 +105,26 @@ object PaintForm: TPaintForm
         ShortCut = 34
         OnClick = FigureDownButClick
       end
+      object UndoBut: TMenuItem
+        Caption = 'Undo'
+        ShortCut = 16474
+        OnClick = UndoButClick
+      end
+      object RedoBut: TMenuItem
+        Caption = 'Redo'
+        ShortCut = 16472
+        OnClick = RedoButClick
+      end
+      object CopyBut: TMenuItem
+        Caption = 'Copy'
+        ShortCut = 16451
+        OnClick = CopyButClick
+      end
+      object PustBut: TMenuItem
+        Caption = 'Past'
+        ShortCut = 16470
+        OnClick = PustButClick
+      end
     end
   end
   object SaveDialog: TSaveDialog

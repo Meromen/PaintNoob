@@ -31,6 +31,7 @@ TFigures = Class
   function Save:TStringArray; virtual;
   procedure Load; virtual;
   function GetParametersList: TStringArray; virtual;
+  function Copy: TFigures; virtual;
 end;
 
 TFigureClass = class of TFigures;
@@ -43,6 +44,7 @@ Public
  procedure CreateRegion; override;
  function Save: TStringArray; override;
  procedure Load; override;
+ //function Copy: TFigures; override;
 end;
 
   {TLine}
@@ -52,6 +54,7 @@ Public
  procedure CreateRegion; override;
  function Save: TStringArray; override;
  procedure Load; override;
+// function Copy: TFigures; override;
 end;
 
   {TRectangle}
@@ -61,6 +64,7 @@ Public
  procedure CreateRegion; override;
  function Save: TStringArray; override;
  procedure Load; override;
+ //function Copy: TFigures; virtual;
 end;
 
   {TEllipse}
@@ -70,6 +74,7 @@ Public
  procedure CreateRegion; override;
  function Save: TStringArray; override;
  procedure Load; override;
+// function Copy: TFigures; virtual;
 end;
 
   {TRoundRect}
@@ -80,6 +85,7 @@ Public
  function Save: TStringArray; override;
  procedure Load; override;
  function GetParametersList: TStringArray; override;
+// function Copy: TFigures; virtual;
 end;
 
 
@@ -91,10 +97,15 @@ TFfigureClass = class of TFigures;
  function CaseBrushStyle(Index: integer):TBrushStyle;
  function CasePenStyleIndex(Style: TPenStyle): integer;
  function CaseBrushStyleIndex(BrushStyle: TBrushStyle): integer;
+ procedure SaveInBuffer;
+ procedure LoadFromBuffer;
 
 var
   FigureList: TFigureList;
   CanvasFigures: Array of TFigures;
+  BufferPointer: integer;
+  BufferBegin: integer;
+  Buffer: array[0..99] of array of TFigures;
 
 
 
@@ -154,6 +165,29 @@ begin
   Canvas.Pen.Style := psDash;
   Canvas.Frame  (WorldToScreen(Point1).x-5-round(LineWidth/2),WorldToScreen(Point1).y-5-round(LineWidth/2),
                  WorldToScreen(Point2).x+5+round(LineWidth/2),WorldToScreen(Point2).y+5+round(LineWidth/2));
+end;
+
+function TFigures.Copy: TFigures;
+var
+  i: integer;
+begin
+  case Self.ClassName of
+    'TPolyline': Result := TPolyline.Create(Wpoint(0,0));
+    'TLine': Result := TLine.Create(Wpoint(0,0));
+    'TRectangle': Result := TRectangle.Create(Wpoint(0,0));
+    'TRoundRect': Result := TRoundRect.Create(Wpoint(0,0));
+    'TEllipse': Result := TEllipse.Create(Wpoint(0,0));
+  end;
+  SetLength(Result.Points, Length(Self.Points));
+  for i:=0 to High(Self.Points) do
+  Result.Points[i] := Self.Points[i];
+ (Result as TFigures).PenColor := Self.PenColor;
+ (Result as TFigures).FillColor := Self.FillColor;
+ (Result as TFigures).LineWidth := Self.LineWidth;
+ (Result as TFigures).FillStyle := Self.FillStyle;
+ (Result as TFigures).PenStyle := Self.PenStyle;
+ (Result as TFigures).WRadius := Self.WRadius;
+ (Result as TFigures).HRadius := Self.HRadius;
 end;
 
 procedure LineRegion(p1,p2:TPoint;var tempPoints: array of TPoint;Width:integer);
@@ -326,6 +360,14 @@ begin
   PenStyle := CasePenStyle(a);
 end;
 
+{function TPolyline.Copy: TFigures;
+begin
+  Result := Inherited;
+ (Result as TPolyLine).LineWidth := Self.LineWidth;
+ (Result as TPolyLine).PenColor := Self.PenColor;
+ (Result as TPolyLine).PenStyle := Self.PenStyle;
+end;                                                    }
+
  {Line}
 
 procedure TLine.CreateRegion;
@@ -374,6 +416,14 @@ begin
   readln(a);
   PenStyle := CasePenStyle(a);
 end;
+
+{function TLine.Copy: TFigures;
+begin
+  Result := Inherited;
+ (Result as TLine).LineWidth := Self.LineWidth;
+ (Result as TLine).PenColor := Self.PenColor;
+ (Result as TLine).PenStyle := Self.PenStyle;
+end;                                           }
 
  {Rectangle}
 
@@ -431,6 +481,16 @@ begin
   PenStyle:= CasePenStyle(a);
 end;
 
+{function TRectangle.Copy: TFigures;
+begin
+  Result := Inherited;
+ (Result as TRectangle).PenColor := Self.PenColor;
+ (Result as TRectangle).FillColor := Self.FillColor;
+ (Result as TRectangle).LineWidth := Self.LineWidth;
+ (Result as TRectangle).FillStyle := Self.FillStyle;
+ (Result as TRectangle).PenStyle := Self.PenStyle;
+end;               }
+
  {TEllipse}
 
 procedure TEllipse.CreateRegion;
@@ -485,6 +545,16 @@ begin
   readln(a);
   PenStyle:= CasePenStyle(a);
 end;
+
+{function TEllipse.Copy: TFigures;
+begin
+  Result := Inherited;
+ (Result as TEllipse).PenColor := Self.PenColor;
+ (Result as TEllipse).FillColor := Self.FillColor;
+ (Result as TEllipse).LineWidth := Self.LineWidth;
+ (Result as TEllipse).FillStyle := Self.FillStyle;
+ (Result as TEllipse).PenStyle := Self.PenStyle;
+end;                                                    }
 
  {TRoundRect}
 
@@ -556,6 +626,52 @@ begin
   readln(a);
   HRadius := a;
 end;
+
+{function TRoundRect.Copy: TFigures;
+begin
+  Result := Inherited;
+ (Result as TRoundRect).PenColor := Self.PenColor;
+ (Result as TRoundRect).FillColor := Self.FillColor;
+ (Result as TRoundRect).LineWidth := Self.LineWidth;
+ (Result as TRoundRect).FillStyle := Self.FillStyle;
+ (Result as TRoundRect).PenStyle := Self.PenStyle;
+ (Result as TRoundRect).WRadius := Self.WRadius;
+ (Result as TRoundRect).HRadius := Self.HRadius;
+end;  }
+
+procedure SaveInBuffer;
+var
+  BufferCount, i, j: integer;
+begin
+  if BufferPointer >= BufferBegin then
+  begin
+    BufferCount := BufferPointer - BufferBegin + 1;
+  end
+  else
+  begin
+    BufferCount := 100 - BufferBegin + BufferPointer + 1;
+  end;
+  if BufferCount = 100 then
+    BufferBegin := (BufferBegin + 1) mod 100;
+  BufferPointer := (BufferPointer + 1) mod 100;
+  SetLength(Buffer[BufferPointer], Length(CanvasFigures));
+  for i:=0 to High(CanvasFigures) do
+  begin
+    Buffer[BufferPointer][i] := CanvasFigures[i].Copy;
+  end;
+end;
+
+procedure LoadFromBuffer;
+var
+  i: integer;
+begin
+  SetLength(CanvasFigures, Length(Buffer[BufferPointer]));
+  for i:=0 to High(CanvasFigures) do
+    CanvasFigures[i] := Buffer[BufferPointer][i].Copy;
+end;
+
+
+
   {Coners of canvas}
 
 function TFigures.FindTopLeft: WorldPoint;

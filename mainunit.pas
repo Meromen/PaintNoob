@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
   ExtCtrls, Spin, ActnList, Buttons, StdCtrls, ComCtrls, UnitTFigure, UnitParams,
-  UnitTTools, Transformation, LCLType, LCLIntf, UnitConstants;
+  UnitTTools, Transformation, LCLType, LCLIntf, UnitConstants, windows;
 
 Type
     TPointList = array of TPoint;
@@ -26,6 +26,10 @@ Type
     EditBut: TMenuItem;
     FigureDownBut: TMenuItem;
     FigureUpBut: TMenuItem;
+    CopyBut: TMenuItem;
+    PustBut: TMenuItem;
+    UndoBut: TMenuItem;
+    RedoBut: TMenuItem;
     SaveAsButPic: TMenuItem;
     OpenDialog: TOpenDialog;
     SaveAsBut: TMenuItem;
@@ -38,6 +42,7 @@ Type
     HScrollBar: TScrollBar;
     VScrollBar: TScrollBar;
     PanelForAll: TPanel;
+    procedure CopyButClick(Sender: TObject);
     procedure DrawPlaceMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure DrawPlaceMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -50,6 +55,8 @@ Type
     procedure LoadButClick(Sender: TObject);
     procedure EditButClick(Sender: TObject);
     procedure MenuItem2Click(Sender: TObject);
+    procedure PustButClick(Sender: TObject);
+    procedure RedoButClick(Sender: TObject);
     procedure SaveAsButClick(Sender: TObject);
     procedure SaveAsButPicClick(Sender: TObject);
     procedure SaveButClick(Sender: TObject);
@@ -57,6 +64,7 @@ Type
     procedure FormCreate(Sender: TObject);
     procedure ToolsButClick(Sender: TObject);
     procedure SaveFile(APictureName: string);
+    procedure UndoButClick(Sender: TObject);
     procedure WriteTitle;
 
 
@@ -150,8 +158,6 @@ begin
   DrawPlace.Invalidate;
 end;
 
-
-
 procedure TPaintForm.DrawPlaceMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin
@@ -166,6 +172,7 @@ end;
 procedure TPaintForm.DrawPlaceMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
+  SaveInBuffer;
   CurrentTool.MouseUp(Button,X,Y);
   IsDrawing:= False;
   DrawPlace.Invalidate;
@@ -185,6 +192,12 @@ begin
 
   For i in CanvasFigures do
     i.Draw(DrawPlace.Canvas);
+
+  if BufferPointer <> BufferBegin then
+    UndoBut.Enabled := True;
+  if (Buffer[(BufferPointer + 1) mod 100] <> Nil)
+    and (((BufferPointer + 1) mod 100) <> BufferBegin) then
+      RedoBut.Enabled := True;
 end;
 
 procedure TPaintForm.FigureDownButClick(Sender: TObject);
@@ -262,18 +275,6 @@ begin
 
 end;
 
-procedure TPaintForm.EditButClick(Sender: TObject);
-begin
-
-end;
-
-procedure TPaintForm.MenuItem2Click(Sender: TObject);
-begin
-
-end;
-
-
-
 procedure TPaintForm.SaveAsButClick(Sender: TObject);
 begin
  SaveDialog.InitialDir := GetCurrentDir;
@@ -321,6 +322,55 @@ begin
 end;
 
 
+procedure TPaintForm.CopyButClick(Sender: TObject);
+var
+  i,j: integer;
+  s: TStringArray;
+begin
+  AssignFile(output,'MyClipBoard.pnt');
+  rewrite(output);
+  writeln('&*_MyPaint_*&');
+  writeln(length(CanvasFigures));
+  for i:= 0 to High(CanvasFigures)  do
+    if CanvasFigures[i].Selected then
+      begin
+        s:= CanvasFigures[i].Save;
+        for j:=0 to high(s) do
+          writeln(s[j]);
+      end;
+   CloseFile(output);
+end;
+
+procedure TPaintForm.PustButClick(Sender: TObject);
+var
+  i,n,j: integer;
+  s: string;
+begin
+  AssignFile(input,'MyClipBoard.pnt');
+  Reset(input);
+  readln(s);
+  if s = '&*_MyPaint_*&' then
+    begin
+      readln(n);
+      SetLength(CanvasFigures, Length(CanvasFigures) + n);
+      for i:= Length(CanvasFigures) - n  to Length(CanvasFigures) - 1 do
+        begin
+          readln(s);
+          for j:=0 to High(ToolsList) do
+            if ToolsList[j].FigureClass <> Nil then
+              if ToolsList[j].FigureClass.ClassName = s then
+                begin
+                  CanvasFigures[i] := ToolsList[j].FigureClass.Create(WPoint(0,0));
+                  CanvasFigures[i].Load;
+                  Break;
+                end;
+        end;
+    end;
+  CloseFile(input);
+  Invalidate;
+end;
+
+
 procedure TPaintForm.SaveButClick(Sender: TObject);
 begin
   if (PreviousPicture = PictureName) then
@@ -339,16 +389,39 @@ begin
   writeln('&*_MyPaint_*&');
   writeln(length(CanvasFigures));
   for i:=0 to high(CanvasFigures) do
-    begin
-      s:= CanvasFigures[i].Save;
-      for j:=0 to high(s) do
-        writeln(s[j]);
-    end;
+
   CloseFile(output);
   PictureName := APictureName;
   PreviousPicture := APictureName;
   PictureChanged:=false;
   WriteTitle;
+end;
+
+
+procedure TPaintForm.RedoButClick(Sender: TObject);
+begin
+  if (Buffer[BufferPointer + 1] <> Nil) and (BufferPointer + 1 <> BufferBegin) then
+    begin
+      BufferPointer := (BufferPointer + 1) mod 100;
+      LoadFromBuffer;
+      if (Buffer[BufferPointer + 1] = Nil) or (BufferPointer + 1 = BufferBegin) then
+        RedoBut.Enabled := False;
+    Invalidate;
+
+  end;
+end;
+
+
+procedure TPaintForm.UndoButClick(Sender: TObject);
+begin
+  if BufferPointer <> BufferBegin then
+    BufferPointer := BufferPointer - 1;
+  if BufferPointer = -1 then
+    BufferPointer := 99;
+  LoadFromBuffer;
+  if BufferBegin = BufferPointer then
+    UndoBut.Enabled := False;
+  Invalidate;
 end;
 
 procedure TPaintForm.WriteTitle;
